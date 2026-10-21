@@ -1,0 +1,36 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "Sub-Store 鸿蒙客户端"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "在本机运行 Sub-Store 后端与管理界面，转换和管理 Surge、Loon、QX、Stash、Clash、sing-box 等订阅"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "咪咪SubStore"
+    },
+    {
+      "name": "perm_internet",
+      "value": "用于运行本机 Sub-Store 服务、拉取你添加的远程订阅和脚本，以及你配置的同步服务"
+    },
+    {
+      "name": "perm_netinfo",
+      "value": "用于获取本机局域网 IP 地址，生成局域网订阅链接"
+    },
+    {
+      "name": "perm_bg",
+      "value": "用于在你开启后台运行后，切到后台时继续提供订阅下载"
+    },
+    {
+      "name": "bg_notice",
+      "value": "咪咪SubStore 服务运行中"
+    },
+    {
+      "name": "perm_biometric",
+      "value": "用于指纹解锁应用（可选，需先设置访问密码）"
+    }
+  ]
+}

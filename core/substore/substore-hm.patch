@@ -1,0 +1,73 @@
+diff --git a/backend/src/utils/yaml.js b/backend/src/utils/yaml.js
+index 998ab02..4e7aa27 100644
+--- a/backend/src/utils/yaml.js
++++ b/backend/src/utils/yaml.js
+@@ -70,6 +70,15 @@ function normalizeStringifyOptions(options = {}) {
+ }
+ 
+ function parse(content, options) {
++    // 咪咪SubStore: native (Go yaml.v3) parse in the embedded runtime; the JS parser is ~10x slower there
++    if (
++        typeof globalThis !== 'undefined' &&
++        typeof globalThis.__hm_yamlParse === 'function' &&
++        typeof content === 'string'
++    ) {
++        const r = globalThis.__hm_yamlParse(content);
++        if (typeof r === 'string') return JSON.parse(r);
++    }
+     return parseYaml(content, normalizeParseOptions(options));
+ }
+ 
+diff --git a/backend/src/vendor/express.js b/backend/src/vendor/express.js
+index 15b43af..2b58ed4 100644
+--- a/backend/src/vendor/express.js
++++ b/backend/src/vendor/express.js
+@@ -131,6 +131,8 @@ export default function express({ substore: $, port, host }) {
+     // dispatch url to route
+     const dispatch = (request, start = 0) => {
+         let { method, url, headers, body } = request;
++        const __done = request.__done;
++        const Response = (h) => __Response(h, __done);
+         headers = formatHeaders(headers);
+         if (/json/i.test(headers['content-type'])) {
+             body = JSON.parse(body);
+@@ -168,7 +170,7 @@ export default function express({ substore: $, port, host }) {
+         if (handler) {
+             // dispatch to next handler
+             const next = () => {
+-                dispatch(method, url, i);
++                dispatch({ ...request, method, url }, i + 1);
+             };
+             const req = {
+                 method,
+@@ -233,6 +235,10 @@ export default function express({ substore: $, port, host }) {
+ 
+     // start service
+     app.start = () => {
++        if (typeof globalThis !== 'undefined' && globalThis.__SS_HM__) {
++            globalThis.__ssDispatch = (req) => dispatch(req);
++            return;
++        }
+         dispatch($request);
+     };
+ 
+@@ -247,7 +253,7 @@ export default function express({ substore: $, port, host }) {
+         }
+     }
+ 
+-    function Response(corsHeaders = {}) {
++    function __Response(corsHeaders = {}, __done) {
+         let statusCode = 200;
+         const { isQX, isLoon, isSurge, isGUIforCores, isEgern } = ENV();
+         const headers = {
+@@ -276,7 +282,9 @@ export default function express({ substore: $, port, host }) {
+                     body,
+                     headers,
+                 };
+-                if (isQX || isGUIforCores) {
++                if (__done) {
++                    __done(response);
++                } else if (isQX || isGUIforCores) {
+                     $done(response);
+                 } else if (isLoon || isSurge || isEgern) {
+                     $done({

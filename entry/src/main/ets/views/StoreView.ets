@@ -1,0 +1,305 @@
+/**
+ * StoreView: the Sub-Store web UI (upstream Sub-Store-Front-End, bundled in the core) served by the local server at
+ * http://127.0.0.1:<port>/ and shown in ArkWeb, with ?api= pointing it at the embedded backend.
+ *  - links that leave 127.0.0.1 (docs, GitHub, clash:// / sing-box:// one-tap imports) open in the system;
+ *  - file inputs (restore a backup, import a file) use the system picker; downloads (backups, exported configs) are
+ *    saved with the system save dialog;
+ *  - navigator.clipboard is bridged to the system pasteboard (ArkWeb has no permission UI for it);
+ *  - while the server is stopped a placeholder with a start button is shown instead.
+ */
+import { webview } from '@kit.ArkWeb';
+import { t, tf } from '../common/I18n';
+import { Store } from '../common/Store';
+import { Server } from '../common/Server';
+import { FileUtil } from '../common/FileUtil';
+import { Log } from '../common/Log';
+import { ActionButton } from '../components/Widgets';
+
+export class WebHolder {
+  static controller: webview.WebviewController = new webview.WebviewController();
+  static attached: boolean = false;
+  static delegate: webview.WebDownloadDelegate = new webview.WebDownloadDelegate();
+  static delegateBound: boolean = false;
+
+  /** Back inside the web UI; false when there is no history (the page handles the back press itself then). */
+  static back(): boolean {
+    try {
+      if (WebHolder.attached && WebHolder.controller.accessBackward()) {
+        WebHolder.controller.backward();
+        return true;
+      }
+    } catch (e) {
+    }
+    return false;
+  }
+
+  static reload(url: string): void {
+    if (!WebHolder.attached) {
+      return;
+    }
+    try {
+      WebHolder.controller.loadUrl(url);
+    } catch (e) {
+      Log.w('Web', 'loadUrl failed');
+    }
+  }
+}
+
+/** Host object exposed to the page as window.MimiHost (clipboard bridge). */
+class HostBridge {
+  copy(text: string): boolean {
+    try {
+      FileUtil.copyText(text);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+}
+
+const CLIPBOARD_JS: string = `
+(function(){
+  try {
+    var host = window.MimiHost;
+    if (!host) return;
+    var write = function(t){ return host.copy(String(t)) ? Promise.resolve() : Promise.reject(new Error('copy failed')); };
+    if (!navigator.clipboard) { Object.defineProperty(navigator, 'clipboard', { value: {}, configurable: true }); }
+    try { navigator.clipboard.writeText = write; } catch (e) {
+      Object.defineProperty(navigator, 'clipboard', { value: { writeText: write }, configurable: true });
+    }
+    var origExec = document.execCommand ? document.execCommand.bind(document) : null;
+    document.execCommand = function(cmd){
+      if (String(cmd).toLowerCase() === 'copy') {
+        var sel = window.getSelection ? String(window.getSelection()) : '';
+        var el = document.activeElement;
+        if (!sel && el && (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT')) {
+          sel = el.value.substring(el.selectionStart || 0, el.selectionEnd || el.value.length);
+        }
+        return host.copy(sel);
+      }
+      return origExec ? origExec.apply(document, arguments) : false;
+    };
+  } catch (e) {}
+})();
+`;
+
+function isLocalUrl(url: string): boolean {
+  const l = url.toLowerCase();
+  return l.startsWith('http://127.0.0.1:') || l.startsWith('http://localhost:') || l.startsWith('about:') ||
+    l.startsWith('blob:') || l.startsWith('data:') || l.startsWith('javascript:');
+}
+
+@ComponentV2
+export struct StoreView {
+  private store: Store = Store.get();
+  @Local srv: Server = Server.get();
+  private bridge: HostBridge = new HostBridge();
+  @Local loading: boolean = true;
+  @Local failed: string = '';
+  private loadedEpoch: number = -1;
+
+  aboutToAppear(): void {
+    this.bindDownloads();
+  }
+
+  @Monitor('srv.startEpoch')
+  onStarted(): void {
+    if (this.srv.startEpoch !== this.loadedEpoch && WebHolder.attached) {
+      this.loadedEpoch = this.srv.startEpoch;
+      this.failed = '';
+      WebHolder.reload(this.srv.webUrl());
+    }
+  }
+
+  private bindDownloads(): void {
+    if (WebHolder.delegateBound) {
+      return;
+    }
+    WebHolder.delegateBound = true;
+    const d = WebHolder.delegate;
+    d.onBeforeDownload((item: webview.WebDownloadItem): void => {
+      const ctx = Store.get().ctx;
+      if (ctx === null) {
+        item.cancel();
+        return;
+      }
+      let name = item.getSuggestedFileName();
+      if (name.length === 0) {
+        const p = item.getUrl().split('?')[0];
+        name = p.substring(p.lastIndexOf('/') + 1);
+      }
+      name = name.replace(new RegExp('[\\\\/:*?"<>|\\n\\r]', 'g'), '_').trim();
+      if (name.length === 0) {
+        name = 'sub-store-' + Date.now();
+      }
+      const dir = ctx.cacheDir + '/downloads';
+      FileUtil.ensureDir(dir);
+      const path = dir + '/' + name;
+      FileUtil.remove(path);
+      item.start(path);
+    });
+    d.onDownloadFinish((item: webview.WebDownloadItem): void => {
+      const st = Store.get();
+      const ctx = st.ctx;
+      if (ctx === null || item.getState() === webview.WebDownloadState.CANCELED) {
+        return;
+      }
+      const path = item.getFullPath();
+      const name = path.substring(path.lastIndexOf('/') + 1);
+      FileUtil.exportFile(ctx, path, name).then((ok: boolean): void => {
+        if (ok) {
+          st.toast(tf('已保存：{0}', name));
+        }
+        FileUtil.remove(path);
+      }).catch((e: Error): void => {
+        st.toast(tf('保存失败：{0}', e.message ?? ''));
+      });
+    });
+    d.onDownloadFailed((item: webview.WebDownloadItem): void => {
+      Store.get().toast(t('下载失败'));
+    });
+  }
+
+  private openExternal(url: string): void {
+    const ctx = this.store.ctx;
+    if (ctx === null) {
+      return;
+    }
+    ctx.openLink(url, { appLinkingOnly: false }).catch((): void => {
+      this.store.toast(t('没有可以打开此链接的应用'));
+    });
+  }
+
+  @Builder
+  placeholder() {
+    Column({ space: 16 }) {
+      Image($r('app.media.startIcon')).width(84).height(84).borderRadius(22)
+      if (this.srv.busy) {
+        LoadingProgress().width(36).height(36).color(this.store.palette().accentUi)
+        Text(t('正在启动 Sub-Store 后端…')).fontSize(15).fontColor(this.store.palette().subtle)
+      } else {
+        Text(t('Sub-Store 服务未运行')).fontSize(18).fontWeight(FontWeight.Medium).fontColor(this.store.palette().text)
+        if (this.srv.error.length > 0) {
+          Text(this.srv.error).fontSize(13).fontColor(this.store.palette().bad).textAlign(TextAlign.Center)
+            .maxLines(4).textOverflow({ overflow: TextOverflow.Ellipsis })
+        }
+        ActionButton({
+          text: t('启动服务'), onTap: () => {
+            this.srv.start();
+          }
+        })
+      }
+    }
+    .width('100%')
+    .height('100%')
+    .padding(32)
+    .justifyContent(FlexAlign.Center)
+  }
+
+  build() {
+    Stack() {
+      Web({ src: this.srv.running ? this.srv.webUrl() : 'about:blank', controller: WebHolder.controller })
+        .javaScriptAccess(true)
+        .domStorageAccess(true)
+        .fileAccess(false)
+        .geolocationAccess(false)
+        .zoomAccess(false)
+        .overScrollMode(OverScrollMode.NEVER)
+        .darkMode(this.store.isDark() ? WebDarkMode.On : WebDarkMode.Off)
+        .forceDarkAccess(false)
+        .backgroundColor(this.store.isDark() ? '#000000' : '#F2F2F2')
+        .javaScriptProxy({
+          object: this.bridge,
+          name: 'MimiHost',
+          methodList: ['copy'],
+          controller: WebHolder.controller
+        })
+        .javaScriptOnDocumentStart([{ script: CLIPBOARD_JS, scriptRules: ['*'] }])
+        .onControllerAttached(() => {
+          WebHolder.attached = true;
+          try {
+            WebHolder.controller.setDownloadDelegate(WebHolder.delegate);
+          } catch (e) {
+            Log.w('Web', 'download delegate failed');
+          }
+          this.loadedEpoch = this.srv.startEpoch;
+          if (this.srv.running) {
+            WebHolder.reload(this.srv.webUrl());
+          }
+        })
+        .onPageBegin(() => {
+          this.loading = true;
+        })
+        .onPageEnd(() => {
+          this.loading = false;
+        })
+        .onErrorReceive((e: OnErrorReceiveEvent) => {
+          if (e.request.isMainFrame()) {
+            this.failed = e.error.getErrorInfo();
+            this.loading = false;
+          }
+        })
+        .onLoadIntercept((e: OnLoadInterceptEvent) => {
+          const url = e.data.getRequestUrl();
+          if (isLocalUrl(url)) {
+            return false;
+          }
+          this.openExternal(url);
+          return true;
+        })
+        .onShowFileSelector((e: OnShowFileSelectorEvent) => {
+          const ctx = this.store.ctx;
+          if (ctx === null) {
+            return false;
+          }
+          // the web engine reads sandbox paths reliably; copy the picked document into cache first
+          FileUtil.pickUris(ctx, 1).then(async (uris: string[]): Promise<void> => {
+            const out: string[] = [];
+            const dir = ctx.cacheDir + '/uploads';
+            FileUtil.ensureDir(dir);
+            for (const u of uris) {
+              const dest = dir + '/' + FileUtil.nameFromUri(u);
+              FileUtil.remove(dest);
+              await FileUtil.copyUriToAsync(u, dest);
+              out.push(dest);
+            }
+            e.result.handleFileList(out);
+          }).catch((): void => {
+            e.result.handleFileList([]);
+          });
+          return true;
+        })
+        .onRenderExited(() => {
+          if (this.srv.running) {
+            setTimeout((): void => WebHolder.reload(this.srv.webUrl()), 300);
+          }
+        })
+        .width('100%')
+        .height('100%')
+        .visibility(this.srv.running ? Visibility.Visible : Visibility.Hidden)
+
+      if (!this.srv.running) {
+        this.placeholder()
+      } else if (this.failed.length > 0) {
+        Column({ space: 12 }) {
+          Text(t('页面加载失败')).fontSize(17).fontColor(this.store.palette().text)
+          Text(this.failed).fontSize(13).fontColor(this.store.palette().subtle)
+          ActionButton({
+            text: t('重新加载'), onTap: () => {
+              this.failed = '';
+              WebHolder.reload(this.srv.webUrl());
+            }
+          })
+        }
+        .width('100%')
+        .height('100%')
+        .justifyContent(FlexAlign.Center)
+        .backgroundColor(this.store.isDark() ? '#000000' : '#F2F2F2')
+      }
+    }
+    .width('100%')
+    .height('100%')
+    .padding({ top: this.store.safeTop, bottom: this.store.safeBottom })
+    .backgroundColor(this.store.isDark() ? '#000000' : '#F2F2F2')
+  }
+}

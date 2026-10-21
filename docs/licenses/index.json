@@ -1,0 +1,13 @@
+[
+ ["Sub-Store (backend)", "2.42.6", "订阅解析、处理与格式转换（内置后端，做了适配修改）", "AGPL-3.0", "sub-store-agpl-3.0.txt"],
+ ["Sub-Store-Front-End", "2.34.1", "Sub-Store 管理界面（内置）", "GPL-3.0", "sub-store-frontend.txt"],
+ ["Sub-Store 后端依赖", "2.42.6", "打包进后端的 npm 依赖（lodash、yaml、js-base64、jsrsasign 等）", "MIT / ISC / BSD / Apache-2.0 等", "sub-store-backend-deps.txt"],
+ ["github.com/dop251/goja", "2026-10-21", "在本机运行 Sub-Store 后端的 JavaScript 引擎", "MIT", "goja.txt"],
+ ["github.com/dop251/goja_nodejs", "2026-09-18", "JavaScript 事件循环、定时器、URL", "MIT", "goja-nodejs.txt"],
+ ["github.com/dlclark/regexp2", "v2.8.1", "JavaScript 正则表达式", "MIT", "regexp2.txt"],
+ ["github.com/go-sourcemap/sourcemap", "v2.1.4", "JavaScript 引擎依赖", "BSD-2-Clause", "sourcemap.txt"],
+ ["github.com/google/pprof", "2024-07-27", "JavaScript 引擎依赖", "Apache-2.0", "pprof.txt"],
+ ["golang.org/x/text", "v0.43.0", "JavaScript 引擎依赖（Unicode）", "BSD-3-Clause", "x-text.txt"],
+ ["golang.org/x/net", "v0.27.0", "Go 网络扩展库", "BSD-3-Clause", "x-net.txt"],
+ ["Go 标准库 (net/http 等)", "1.26", "内核运行时、HTTP 服务", "BSD-3-Clause", "go.txt"]
+]

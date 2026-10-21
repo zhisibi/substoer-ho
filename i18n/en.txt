@@ -1,0 +1,678 @@
+Text files (.txt,.log)|.txt,.log
+Never run
+Just now
+{0} min ago
+{0} h ago
+{0} d ago
+in {0} s
+in {0} min
+in {0} h {1} min
+in {0} h
+in {0} d
+{0} s
+{0} min {1} s
+{0} h {1} min
+{0} d {1} h
+…
+Settings
+Cancel
+{0} failed: {1}
+Checking for updates…
+Already up to date 
+Update check failed. Try again later or check AppGallery
+OK
+Back
+, selected
+Search
+expanded
+collapsed
+Saved
+Delete
+Name
+Save
+Please read and accept the
+User Agreement
+and
+Privacy Policy
+Decline
+Accept and continue
+Show navigation bar
+Import
+User Agreement
+Privacy Policy
+Copy
+Withdraw privacy consent
+Withdraw
+Background picture set
+Can't read the selected picture
+ · 
+Follow system
+Cleared
+Appearance
+Theme
+Accent color
+Background
+Plain
+Custom picture
+Immersive light
+A soft glow in the accent color at the top; bars and cards blend into the background
+Frosted glass
+Translucent blurred material for the tab bar, side rail and cards
+Bars, the side rail and cards use a translucent blur; most visible with a background picture, a gradient or immersive light
+Blur strength
+语言 / Language
+About
+Version
+Check for updates
+Developer
+Contact email
+Email copied
+Light
+Dark
+Light
+Standard
+Heavy
+Indigo
+Sky blue
+Violet
+Huawei Red
+Amber
+Aurora
+Ocean
+Dusk
+Forest
+Mist
+Sakura
+ copy
+Port
+Link copied
+Open-source licenses
+Clear all data
+Clear all
+Data & privacy
+Mint
+Copied
+Cannot read the selected file
+Edit
+Got it
+Servers
+Server address
+Share
+The passwords do not match
+Export encrypted backup
+Export failed: {0}
+Restore from backup
+Restore failed: {0}
+Working…
+Wrong backup password, or the file is damaged
+Start
+Exported
+More
+Access password
+Export
+Not running
+Clear log
+Clear
+Share failed
+Set a backup password
+At least 6 characters
+The backup is encrypted with this password (Argon2id + AES-256-GCM) and needs it to restore. A forgotten password can't be recovered.
+The backup password needs at least 6 characters
+Enter the backup password again
+Enter the backup password
+About background running
+Backup & restore
+Transport
+Path
+Host
+Early data (max-early-data)
+gRPC service name
+Host (comma separated)
+XHTTP mode
+TLS
+Allow UDP
+Cipher
+Password
+UDP over TCP
+Plugin
+Plugin mode
+Plugin host
+Plugin path
+Plugin TLS
+ShadowTLS password
+ShadowTLS version
+uTLS fingerprint
+Protocol
+Protocol parameter
+Obfuscation
+Obfuscation parameter
+UUID
+alterId
+Flow
+Auth string
+Upload bandwidth (Mbps)
+Download bandwidth (Mbps)
+Obfuscation password
+Port hopping (e.g. 20000-30000)
+SNI (server name)
+Skip certificate verification (insecure)
+ALPN (comma separated)
+Port hopping (e.g. 20000-30000,40000)
+Hop interval (s)
+Congestion control
+UDP relay mode
+0-RTT
+Private key
+Peer public key
+Pre-shared key
+Local IPv4
+Local IPv6
+MTU
+Reserved (e.g. 1,2,3)
+Username
+TLS (HTTPS)
+Private key (PEM)
+Private key passphrase
+Host keys (comma separated)
+QUIC
+PSK
+Obfuscation host
+Transport protocol
+Port range (e.g. 6000-6100)
+Multiplexing
+Universal
+Base64 share-link list for most clients
+mihomo (Clash Meta)
+Full config: Proxy / Auto / Fallback / Load Balance, region and service groups, rules
+sing-box 1.13
+Full config: TUN + mixed inbounds, DNS, region and service groups, rule sets
+sing-box 1.14
+1.14 format: rule sets downloaded via http_clients
+sing-box 1.15 (pre-release)
+Generated from the 1.15 pre-release docs
+Clash (classic)
+Classic Clash protocols only, same groups as mihomo
+Stash
+Clash-compatible config
+Surge
+Surge 5 managed profile with policy groups
+Quantumult X
+Server resource (server_remote)
+Loon
+Node subscription
+Shadowrocket
+Base64 share links
+v2rayN
+Base64 share links (only protocols v2rayN supports)
+Manual order
+Date added
+Source
+Latency
+Nodes
+Subs
+Server
+Core runtime, HTTP subscription server
+Clash / mihomo YAML parsing and output
+Encrypted backup (Argon2id)
+Port {0} is in use, choose another port in the settings
+Start failed: {0}
+Background running was not allowed; the server may pause in the background
+This package does not contain the core libmimisub.so, so nodes can't be parsed or served. If you built it yourself, run core/build-core.sh first (see README) and rebuild.
+Core version mismatch: the app needs {0}, the package has {1}. Rebuild the core, otherwise some features may misbehave.
+Core problem
+Save failed
+Added manually
+Deleted subscription
+Subscription not found
+No nodes found
+This is not a MimiSub backup file
+QR code saved to the gallery
+Subscription server started automatically (port {0})
+Background running not enabled
+Scan failed: {0}
+No QR code found in the picture
+Import failed: {0}
+Imported {0} nodes
+, {0} duplicates skipped
+, {0} lines not recognized
+Import subscription URL
+Subscription URL found:\n{0}\n\nDownload and import its nodes?
+Downloading subscription…
+Paste share links or config content first
+This is a subscription URL; import it under "Subscription URL"
+Enter a subscription URL starting with http:// or https://
+This subscription is already imported; refresh it in "Imported subscriptions"
+No text on the clipboard
+Can't read the clipboard
+Accepts multi-line share links (vmess / vless / trojan / ss / ssr / hysteria / hy2 / tuic / anytls / wireguard / socks / http / ssh / naive / mieru), base64 subscriptions, Clash / mihomo YAML, sing-box JSON and Surge / Loon / Quantumult X node lines.
+Paste here…
+Scan
+Subscription URL
+Name (optional)
+Leave empty to use the subscription title or domain
+User-Agent (some providers return different formats per client)
+Custom
+Download & import
+Imported nodes remember their subscription: refresh it later in "Imported subscriptions"; nodes already used in generated subscriptions are kept.
+Scan QR code
+QR code from picture
+Import from file
+A QR code can hold a subscription URL (imported as a subscription) or node share links (imported as nodes). Scanning is done by the system scanner; this app uses no camera permission.
+Import nodes
+Paste
+Scan / file
+Refresh failed: {0}
+Refreshed: {0} added, {1} removed
+Subscription name
+User-Agent
+Leave empty for the default clash.meta
+Delete subscription
+Delete "{0}"?
+Delete the subscription and its nodes
+Delete the subscription, keep the nodes
+Refresh
+Copy URL
+Used {0} / {1}
+ · expires {0}
+{0} nodes · updated {1}
+never
+Last refresh failed: {0}
+Imported subscriptions
+{0}
+Refresh all
+No subscription URLs imported yet. Imported nodes can be refreshed at any time.
+Welcome to MimiSub
+Local proxy node & subscription manager: import, edit, de-duplicate and test nodes, generate mihomo, sing-box and other subscriptions, and serve them on this device or your LAN.
+No sign-up, data stays on this device
+No account, no analytics, ad or push SDKs; nodes and subscriptions are stored only on this device
+Only connects where you point it
+Reaches only the subscription URLs you import and the servers you test, never the developer's servers
+LAN subscription server
+Started by you; links carry a random token; restrict it to this device or add a password
+Scanning by the system
+QR codes are scanned by the system scanner; no camera permission
+MimiSub
+Server running · port {0}
+{0} nodes
+MimiSub uses the following open-source software. Thanks to their authors. Tap to read each license.
+Please fill in: {0}
+Not recognized: {0}
+Not a valid share link
+{0} nodes found, using the first
+Applied, remember to save
+Delete node
+Delete this node? It is also removed from subscriptions.
+Discard changes
+Changes are not saved. Leave anyway?
+Leave
+Test latency
+Latency: {0}
+Duplicate as new node
+(none)
+Show passwords and keys
+This node has no common share-link form ({0}), but exports fine to mihomo / sing-box and other subscriptions.
+Paste a share link to replace these settings
+Apply
+Node config (mihomo format)
+Add node
+Edit node
+Share link / QR
+My subscription {0}
+Enter a subscription name
+Remove
+New subscription
+Edit subscription
+Client update interval
+{0} h
+Format
+Nodes ({0})
+Pick nodes
+No nodes yet. Tap "Pick nodes" to choose by protocol, source or keyword, or select all at once.
+{0} selected
+Deselect all
+Select all
+Search name or server
+All protocols
+All sources
+No nodes yet: import some on the Nodes page first.
+Done ({0} nodes)
+Regenerate link
+The old link stops working immediately; clients using it need the new link. Continue?
+Regenerate
+New subscription link generated
+The link stops working immediately (nodes are kept).
+Export failed
+This device
+LAN
+QR code
+Subscription link copied
+The subscription server is not running, clients can't download right now.
+No LAN IP found: connect to Wi-Fi or turn on the hotspot, then reopen this page.
+Content
+Nodes included
+Generating…
+{0} nodes skipped because this format can't express them:
+Export to file
+Preview
+{0} characters
+Testing
+DNS failed
+Timeout
+Delete the {0} selected nodes? They are also removed from subscriptions.
+Deleted {0} nodes
+Batch rename
+Prefix, e.g. "AirA-"
+Adds a prefix to each name; ending with # numbers them instead, e.g. "HK#" → HK01, HK02
+Renamed {0} nodes
+Removed {0} duplicate nodes
+No duplicates
+Paste share links / config
+Add node manually
+Select
+Test all
+De-duplicate
+Unnamed node
+No nodes yet
+Start here: paste share links, import a provider subscription, scan a QR code or add one by hand. Then combine nodes into mihomo / sing-box and other subscriptions on the Subs page and serve them on the Server page.
+{0} nodes · {1} sources
+Sort
+No matching nodes
+1024–65535; the server restarts automatically
+The port must be between 1024 and 65535
+Leave empty for none
+Subscription links then carry ?key=password and requests without it are refused (links already contain a random token).
+Access password set; copy the subscription links again
+Access password removed
+When on, starting the server requests a "data transfer" continuous task with an ongoing notification so subscriptions keep being served in the background.\n\nHarmonyOS may still end it: data-transfer tasks must keep reporting progress and the system cancels them after about 10 minutes without it; battery saving or clearing recent apps also stops the app. Start the server again when you come back.\n\nFor always-on serving, keep the app in the foreground or use an always-on computer / NAS.
+Running · port {0}
+Subscription server running
+Subscription server stopped
+Up {0} · {1} requests
+{0} subscriptions ready to serve
+Stop server
+Start server
+Addresses
+No LAN IP found: connect to Wi-Fi or turn on the hotspot, then tap refresh at the top right.
+Set to this device only; LAN devices can't download.
+Full subscription links (with their random token) are on the Subs page.
+Server settings
+Allow LAN access
+When off, listens on 127.0.0.1 only: only clients on this device can download
+Set
+Not set
+Keep running in background
+Requests a system continuous task (ongoing notification) when the server starts; the system may still end it
+Start the server when the app opens
+Access log ({0})
+No requests yet. Downloads by clients appear here.
+Withdrawing stops the subscription server and quits the app; you will be asked again next time. Your nodes and subscriptions are not deleted; use "Delete all data" or uninstall to remove them. Withdraw?
+Deletes all nodes, imported subscriptions and generated subscriptions (their links stop working). This can't be undone; export an encrypted backup first.
+Nothing to back up yet
+Exported {0} nodes, {1} subscriptions
+Restore mode
+Merge: the backup's version replaces the same node / subscription, others are kept. Replace: clear current data, then restore.
+Merge
+Replace
+Restored {0} nodes, {1} subscriptions
+Export JSON (unencrypted)
+The file contains every node's passwords and keys. Keep it safe. Continue?
+Export all nodes, imported and generated subscriptions into one password-encrypted file (Argon2id + AES-256-GCM) to restore on a new device. No account, no server.
+Import nodes from file
+Nodes and subscriptions are stored only in this app's sandbox on this device (encrypted by the system). No account, no data collection; the app goes online only to import subscription URLs, test latency or run the subscription server.
+Local proxy node & subscription manager
+Core
+Core missing
+This app only manages your own node settings and provides no proxy servers or nodes. Please obey local laws.
+Updates every {0} h
+Copy subscription link
+Subscription link copied (server not running)
+{0} subscriptions · server running
+{0} subscriptions · server stopped
+No subscriptions yet
+Combine picked nodes into a subscription: universal base64, mihomo, Clash, Stash, sing-box 1.13 / 1.14 / 1.15, Surge, Quantumult X, Loon, Shadowrocket, v2rayN. Each has its own random link, served on this device or your LAN.
+No fingerprint enrolled yet. Add one in system Settings first
+No permission to use the fingerprint ({0})
+No usable fingerprint on this device ({0})
+Too many attempts. Fingerprint is locked for now, use the password
+Fingerprint check failed ({0})
+Use password
+Background task started (data transfer)
+Background task not allowed by the system: {0}
+Background task stopped
+Too many attempts. Try again in {0}
+Cannot read the password record. Use “Forgot password” to set a new one
+Wrong password
+Unlock MimiSub
+No security questions are set, the password cannot be reset
+Wrong answers
+Access password reset
+Unlock
+Fingerprint unlock
+Forgot password
+Answer your security questions to set a new access password.
+Answer
+Next
+New password
+At least 4 characters
+Repeat
+Save and unlock
+MimiSub is locked
+Set a new password
+Set an access password?
+MimiSub will ask for the password when it opens, and fingerprint unlock can be added. A forgotten password can be reset with security questions. You can skip this and turn it on later in Settings › Security.
+Set access password
+Skip
+Change access password
+Change security questions
+The current password is wrong
+Security questions updated
+Access password set
+Custom question
+Security question {0}
+Your question
+Current password
+If you forget the password, answer all security questions to set a new one. Answers ignore case and surrounding spaces; only salted hashes are stored.
+The old link without a format still serves {0}, the format it was created with
+Starting…
+Stopping…
+Running
+Failed to start
+Stopped
+Port {0} · {1}
+LAN access
+This device only
+Tap the round button to start the subscription server
+Run log ({0})
+Auto-scroll
+Scrolling paused
+No log yet. Starting and stopping the server and every client download show up here live.
+Local + {0} LAN address(es)
+Each subscription’s full links (with the random token and format) are on the Subscriptions tab: tap a subscription.
+Port & access control
+Port {0}
+password
+Background & autostart
+Background
+Foreground only
+Autostart
+Background task
+Off
+{0} min
+Enter the current access password
+Turn off access password
+Turn on fingerprint unlock
+Fingerprint unlock is on
+Security
+Password + fingerprint
+No access password
+The app asks for the access password when it opens; a forgotten password can be reset with security questions. Only salted hashes (PBKDF2) of the password and answers are kept, in the system Asset Store.
+Unlock with a fingerprint; the password always works too
+Lock again after this long in the background
+Edit name and nodes
+Details, preview & export
+tap to pick a format
+{0} node(s)
+{0} skipped (unsupported by this format)
+Choose a format
+Combine picked nodes into a subscription, then take its link in any format: generic Base64, mihomo, Clash, Stash, sing-box 1.13 / 1.14 / 1.15, Surge, Quantumult X, Loon, Shadowrocket, v2rayN. Each subscription has its own random link, downloadable on this device or the LAN.
+In which city were you born?
+What was the name of your primary school?
+What was the name of your first pet?
+What is your mother’s name?
+What is your favourite book?
+Which company did you first work for?
+What is the name of your best childhood friend?
+What is your most memorable travel destination?
+The password needs at least 4 characters
+The password can have at most 64 characters
+The password cannot be only spaces
+Set all security questions
+Fill in the security question
+Answers need at least 2 characters
+Pick different security questions
+Copy import link
+Open
+Import link copied
+No app can open sing-box:// import links; copy the subscription URL and add it manually
+Scan this QR code in SFA; to add manually, choose Remote profile and paste the subscription URL
+MaoBox, MaoMo and other Clash-core clients: use the mihomo format (this sing-box link also serves them the mihomo config automatically)
+Subscription server is off
+Collapse
+Tap to enlarge or save
+Scan with SFA · tap to enlarge or save
+Scan in your client · tap to enlarge or save
+Import link
+SFA: scan or tap Open; MaoBox / MaoMo: use mihomo
+Add a subscription in your client and paste the link
+LAN addresses are for other devices on the same Wi-Fi or hotspot; the This device address only works for clients on this phone.
+{0} skipped
+Nodes this format does not support:
+{0} is not installed (or too old)
+Install or update {0} and try again. Download: {1}
+Download
+Cannot open the browser
+{0}
+Import into {0}
+Cat apps on this phone import in one tap; other clients: paste the link
+One-tap import uses this phone's 127.0.0.1 address, starts the subscription server if needed, and needs a recent MaoMo / MaoBox / MaoRay that supports importing.
+Import into
+This phone · right format
+MaoMo
+MaoBox
+MaoRay
+A local tool only, use it lawfully
+The app provides no proxy, VPN or node service; you are responsible for where your nodes and subscriptions come from. Obey the laws of the People's Republic of China and your jurisdiction and never use it for anything illegal
+Refreshed: local access only
+Refreshed: no LAN address found
+Refreshed: {0} LAN address(es)
+Refresh addresses and status
+Time
+Level
+Status
+Client
+Method
+Size
+Log entry
+Request details
+View log entry
+Cancelled. Tap the fingerprint icon to try again
+Fingerprint not recognized. Try again
+Tap to unlock with fingerprint
+Use password
+Use fingerprint
+This package does not include the core libmimisubstore.so, so the Sub-Store backend cannot run. If you built it yourself, run core/build-core.sh first (see README) and rebuild.
+Welcome to MimiSubStore
+A HarmonyOS client for the open-source subscription manager Sub-Store: its backend and web UI both run on this device and convert Surge, Loon, QX, Stash, Clash, sing-box and other subscription formats.
+No account and no analytics, ads or push SDKs; subscriptions and settings stay on this device
+Goes online only to fetch the remote subscriptions and scripts you add or the sync service you set up, never through the developer's servers
+This device only by default
+The service listens on 127.0.0.1; with LAN access on, other devices can still only download subscription links
+MimiSubStore
+Service stopped
+Service and settings
+Unlock MimiSubStore
+MimiSubStore is locked
+Ask for a password when MimiSubStore opens, optionally with fingerprint unlock. If you forget it, reset it with your security questions. You can also skip this and turn it on later in Settings › Security.
+MimiSubStore uses the following open-source software, with thanks to its authors. Tap one to read the full license.
+Time
+Sub-Store backend {0}
+Sub-Store backend
+Tap the round button to start the Sub-Store service
+Links copied in Sub-Store use 127.0.0.1, for clients on this device; on other devices replace it with a LAN address above. Other devices can only reach /download and /share subscription links.
+On: devices on your LAN can download subscriptions (/download, /share). Off: listen on 127.0.0.1 only
+Web UI on the LAN
+Let other devices open the Sub-Store UI in a browser and call the backend API. The backend has no login, so anyone on the network can view and change your data; use only on trusted networks
+Web UI on the LAN
+The Sub-Store backend has no username or password. Once on, any device on your LAN can open the web UI and view, change or delete your subscriptions and nodes.\n\nTurn it on only on trusted networks such as at home, and turn it off when you are done.
+Turn on anyway
+Withdrawing stops the service and quits the app; you will need to agree again next time. Your Sub-Store data is not deleted; use Erase all data or uninstall the app for that. Withdraw?
+This deletes every subscription, collection, file, sync setting and setting in Sub-Store, and its subscription links stop working. This cannot be undone; back up first in Sub-Store under My › Manual management.
+Sub-Store has its own backup: on Sub-Store's My page, Manual management backs up to a file or restores from one, and you can also set up GitHub Gist sync.
+On this device only
+Sub-Store data is kept only in this app's sandbox on this device (encrypted by the system). The app has no account and collects nothing; it goes online only when Sub-Store fetches the remote subscriptions or scripts you add or the sync service you set up.
+Sub-Store for HarmonyOS · runs locally
+backend {0} · front-end {1}
+Built on the open-source Sub-Store project (AGPL-3.0 / GPL-3.0). The app only manages your own subscriptions on this device and provides no proxy servers or nodes. Please obey local laws.
+Saved: {0}
+Save failed: {0}
+Download failed
+No app can open this link
+Starting the Sub-Store backend…
+Sub-Store service is not running
+Page failed to load
+Reload
+Subscription parsing, processing and conversion (bundled backend, adapted)
+Sub-Store web UI (bundled)
+npm dependencies bundled into the backend (lodash, yaml, js-base64, jsrsasign, etc.)
+Sub-Store backend dependencies
+JavaScript engine that runs the Sub-Store backend on the device
+JavaScript event loop, timers, URL
+JavaScript regular expressions
+JavaScript engine dependency
+JavaScript engine dependency (Unicode)
+Go networking extensions
+Core runtime, HTTP service
+MIT / ISC / BSD / Apache-2.0, etc.
+Full log
+Copy all
+Save as file
+No log entries
+Copied {0} log entries
+Clear the whole run log?
+{0} entries
+All
+Backend
+Access
+Errors
+Auto
+GitHub direct
+Mirrors first
+Check failed: {0}
+Sub-Store is up to date
+Update failed: {0}
+Updated to backend {0} · frontend {1}
+Restore built-in version
+Delete the downloaded update and go back to the built-in backend {0} · frontend {1}? Your subscriptions and settings are kept.
+Restore
+Built-in version restored
+New Sub-Store available: backend {0} · frontend {1}. Install it in Settings → Sub-Store update
+updated
+built-in
+Not checked
+{0} available
+Up to date
+Tap “Check for updates” to get the latest build from GitHub.
+The new backend needs a newer MimiSubStore; update the app first. The web UI can still be updated on its own.
+An update is available. Files are verified and the backend is test-started first; then the service restarts. Your subscriptions and settings are kept.
+Up to date (built {0})
+Sub-Store update
+Latest backend
+Frontend
+Latest frontend
+Update now
+Download route
+GitHub can be slow in mainland China; “Auto” tries GitHub first, then public mirrors such as ghfast.top and gh-proxy.com. Every file is checked against the manifest's SHA-256.
+Check on startup
+At most once a day; shows a notice when there is a new version
+Updates come from this app's open-source repository: GitHub Actions follows sub-store-org's releases, applies the same compatibility patches as the app, runs a smoke test and publishes. If a new backend fails to start, the built-in one is used.
+Source code

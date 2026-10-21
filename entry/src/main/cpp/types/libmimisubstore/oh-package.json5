@@ -1,0 +1,6 @@
+{
+  "name": "libmimisubstore.so",
+  "types": "./index.d.ts",
+  "version": "1.0.0",
+  "description": "MimiSubStore Go core (embedded Sub-Store)"
+}

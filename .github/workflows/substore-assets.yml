@@ -1,0 +1,118 @@
+# Follows upstream Sub-Store releases and publishes builds the app can install in 设置 → Sub-Store 更新:
+#   release substore-<backend>-<frontend>: backend.js (patched for the embedded runtime) + web.zip (upstream dist.zip)
+#   release substore-latest:               manifest.json (versions, absolute URLs, sha256, hostApi, minCore)
+# The backend is built with core/substore/prepare.sh (same patches as the bundled copy) and must pass
+# core/substore/smoke.sh before anything is published.
+name: Sub-Store assets
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'core/substore/**'
+      - 'core/ssc/**'
+      - '.github/workflows/substore-assets.yml'
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      backend_tag:
+        description: 'Sub-Store backend tag (empty = latest release)'
+        required: false
+      frontend_tag:
+        description: 'Sub-Store-Front-End tag (empty = latest release)'
+        required: false
+      force:
+        description: 'Rebuild even if this pair is already published'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: substore-assets
+  cancel-in-progress: false
+
+env:
+  # oldest app core that can run builds of this workflow (core/ssc HostAPI must match HOST_API)
+  MIN_CORE: '1.1.0'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve upstream versions
+        id: v
+        run: |
+          B="${{ inputs.backend_tag }}"; F="${{ inputs.frontend_tag }}"
+          [ -n "$B" ] || B=$(gh api repos/sub-store-org/Sub-Store/releases/latest --jq .tag_name)
+          [ -n "$F" ] || F=$(gh api repos/sub-store-org/Sub-Store-Front-End/releases/latest --jq .tag_name)
+          HOST_API=$(grep -oP 'const HostAPI = \K[0-9]+' core/ssc/update.go)
+          REL="substore-$B-$F"
+          echo "backend=$B frontend=$F hostApi=$HOST_API release=$REL"
+          echo "backend=$B" >> $GITHUB_OUTPUT; echo "frontend=$F" >> $GITHUB_OUTPUT
+          echo "hostApi=$HOST_API" >> $GITHUB_OUTPUT; echo "release=$REL" >> $GITHUB_OUTPUT
+          if [ "${{ inputs.force }}" != "true" ] && gh release view "$REL" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "already published"; echo "skip=true" >> $GITHUB_OUTPUT
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.v.outputs.skip != 'true'
+        with:
+          node-version: 22
+
+      - uses: actions/setup-go@v5
+        if: steps.v.outputs.skip != 'true'
+        with:
+          go-version-file: core/go.mod
+          cache-dependency-path: core/go.sum
+
+      - name: Build backend + web UI (prepare.sh)
+        if: steps.v.outputs.skip != 'true'
+        env:
+          BACKEND_TAG: ${{ steps.v.outputs.backend }}
+          FRONTEND_TAG: ${{ steps.v.outputs.frontend }}
+          WORK: ${{ runner.temp }}/ss
+        run: bash core/substore/prepare.sh
+
+      - name: Smoke test
+        if: steps.v.outputs.skip != 'true'
+        run: bash core/substore/smoke.sh
+
+      - name: Publish
+        if: steps.v.outputs.skip != 'true'
+        env:
+          B: ${{ steps.v.outputs.backend }}
+          F: ${{ steps.v.outputs.frontend }}
+          REL: ${{ steps.v.outputs.release }}
+          HOST_API: ${{ steps.v.outputs.hostApi }}
+        run: |
+          set -e
+          mkdir -p out
+          cp core/ssc/assets/backend.js out/backend.js
+          cp "$RUNNER_TEMP/ss/dist-$F.zip" out/web.zip
+          BASE="https://github.com/$GITHUB_REPOSITORY/releases/download/$REL"
+          python3 - <<PY
+          import hashlib, json, os, datetime
+          def part(ver, name):
+              b = open('out/' + name, 'rb').read()
+              return {"version": ver, "url": "$BASE/" + name, "sha256": hashlib.sha256(b).hexdigest(), "size": len(b)}
+          m = {"schema": 1, "hostApi": int("$HOST_API"), "minCore": "$MIN_CORE",
+               "built": datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
+               "backend": part("$B", "backend.js"), "frontend": part("$F", "web.zip")}
+          json.dump(m, open('out/manifest.json', 'w'), indent=2)
+          print(json.dumps(m, indent=2))
+          PY
+          NOTES="Sub-Store backend $B (patched for 咪咪SubStore's embedded runtime) + Sub-Store-Front-End $F.
+          Built from https://github.com/sub-store-org/Sub-Store/releases/tag/$B and https://github.com/sub-store-org/Sub-Store-Front-End/releases/tag/$F; installed by the app in 设置 → Sub-Store 更新."
+          gh release delete "$REL" -y --cleanup-tag 2>/dev/null || true
+          gh release create "$REL" out/backend.js out/web.zip out/manifest.json --title "Sub-Store $B / Front-End $F" --notes "$NOTES" --latest=false
+          gh release view substore-latest >/dev/null 2>&1 || \
+            gh release create substore-latest --title "Sub-Store update manifest" --latest=false \
+              --notes "manifest.json here always points at the newest build the app should install (see the substore-* releases)."
+          gh release upload substore-latest out/manifest.json --clobber

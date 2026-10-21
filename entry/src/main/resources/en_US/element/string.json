@@ -1,0 +1,36 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "Sub-Store client for HarmonyOS"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "Runs the Sub-Store backend and web UI on this device to convert and manage Surge, Loon, QX, Stash, Clash and sing-box subscriptions"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "MimiSubStore"
+    },
+    {
+      "name": "perm_internet",
+      "value": "Runs the local Sub-Store service and fetches the remote subscriptions, scripts and sync services you add"
+    },
+    {
+      "name": "perm_netinfo",
+      "value": "Reads this device's LAN IP address to build LAN subscription links"
+    },
+    {
+      "name": "perm_bg",
+      "value": "Keeps serving subscriptions in the background after you turn on background running"
+    },
+    {
+      "name": "bg_notice",
+      "value": "MimiSubStore service is running"
+    },
+    {
+      "name": "perm_biometric",
+      "value": "Used to unlock the app with your fingerprint (optional, needs an access password)"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+/node_modules
+/oh_modules
+/local.properties
+/.idea
+**/build
+/.hvigor
+.cxx
+/.clangd
+/.clang-format
+/.clang-tidy
+**/.test
+/.appanalyzer
+oh-package-lock.json5
+
+# local
+*.hap
+*.app
+*.p12
+*.cer
+*.p7b
+*.csr
+
+# native core: build with core/build-core.sh
+entry/libs/arm64-v8a/libmimisubstore.so
+core/test-out/
+core/out/
+entry/oh_modules/
+
+core/msc/testdata/out/
+
+# CI / scratch
+/out/
+
+# scratch
+/out/
+core/substore/.build/
