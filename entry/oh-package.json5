@@ -1,7 +1,7 @@
 {
   "name": "entry",
-  "version": "1.2.1",
-  "description": "SubStore HO main module",
+  "version": "1.2.2",
+  "description": "MimiSubStore main module",
   "main": "",
   "author": "zhisibi",
   "license": "Apache-2.0",

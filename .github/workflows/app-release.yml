@@ -49,4 +49,4 @@ jobs:
           cp out/app/v$V/*.hap rel/
           [ -d "out/core/v$V" ] && cp out/core/v$V/*.so rel/ || true
           (cd rel && sha256sum * > SHA256SUMS && cat SHA256SUMS)
-          gh release create "$TAG" rel/* -R "$GITHUB_REPOSITORY" --title "SubStore HO $V" --notes-file notes.md --latest
+          gh release create "$TAG" rel/* -R "$GITHUB_REPOSITORY" --title "MimiSubStore $V" --notes-file notes.md --latest

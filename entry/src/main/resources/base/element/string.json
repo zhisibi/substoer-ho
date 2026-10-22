@@ -10,7 +10,7 @@
     },
     {
       "name": "EntryAbility_label",
-      "value": "SubStore HO"
+      "value": "咪咪SubStore"
     },
     {
       "name": "perm_internet",
@@ -26,7 +26,7 @@
     },
     {
       "name": "bg_notice",
-      "value": "SubStore HO 服务运行中"
+      "value": "咪咪SubStore 服务运行中"
     }
   ]
 }

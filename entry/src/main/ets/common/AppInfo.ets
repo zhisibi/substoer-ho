@@ -1,7 +1,7 @@
 /** Fixed app facts shown in 服务管理 › 关于 and used by the legal pages. */
 import { bundleManager } from '@kit.AbilityKit';
 
-export const APP_NAME: string = 'SubStore HO';
+export const APP_NAME: string = '咪咪SubStore';
 export const DEVELOPER: string = 'Hark Agent';
 /** Source code (AGPL-3.0), releases, issues */
 export const REPO_URL: string = 'https://github.com/zhisibi/substoer-ho';

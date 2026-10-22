@@ -1,4 +1,4 @@
-# SubStore HO · Sub-Store for HarmonyOS
+# 咪咪SubStore (MimiSubStore) · Sub-Store for HarmonyOS
 
 [Sub-Store](https://github.com/sub-store-org/Sub-Store) 的**第三方、非官方** HarmonyOS NEXT 客户端：Sub-Store 后端和管理界面都在手机本地运行，不需要服务器，也不需要 Node.js。
 

@@ -10,7 +10,7 @@
     },
     {
       "name": "EntryAbility_label",
-      "value": "SubStore HO"
+      "value": "MimiSubStore"
     },
     {
       "name": "perm_internet",
@@ -26,7 +26,7 @@
     },
     {
       "name": "bg_notice",
-      "value": "SubStore HO service is running"
+      "value": "MimiSubStore service is running"
     }
   ]
 }

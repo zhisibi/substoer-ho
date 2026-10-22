@@ -1,8 +1,8 @@
-# SubStore HO Disclaimer & Privacy Notice
+# MimiSubStore Disclaimer & Privacy Notice
 
 Updated: October 22, 2026 (version 2)
 
-Please read this notice before using SubStore HO ("the app"). By continuing to use it you confirm that you have read, understood and agreed to all of it; if you do not agree, stop using and uninstall the app. The app is open source under AGPL-3.0, and nothing here limits your rights under that license.
+Please read this notice before using MimiSubStore ("the app"). By continuing to use it you confirm that you have read, understood and agreed to all of it; if you do not agree, stop using and uninstall the app. The app is open source under AGPL-3.0, and nothing here limits your rights under that license.
 
 ## 1. Developed by AI
 

@@ -1,6 +1,6 @@
 {
   "modelVersion": "6.0.0",
-  "description": "SubStore HO: unofficial Sub-Store client for HarmonyOS",
+  "description": "MimiSubStore: unofficial Sub-Store client for HarmonyOS",
   "dependencies": {},
   "devDependencies": {}
 }
