@@ -43,5 +43,10 @@ jobs:
       - name: Publish
         run: |
           V="${TAG#v}"
-          gh release delete "$TAG" -y 2>/dev/null || true
-          gh release create "$TAG" out/app/v$V/* out/core/v$V/* --title "SubStore HO $V" --notes-file notes.md --verify-tag --latest
+          gh release delete "$TAG" -y -R "$GITHUB_REPOSITORY" 2>/dev/null || true
+          # both dist folders carry a SHA256SUMS: upload the HAP and the core once, with one combined checksum file
+          mkdir -p rel
+          cp out/app/v$V/*.hap rel/
+          [ -d "out/core/v$V" ] && cp out/core/v$V/*.so rel/ || true
+          (cd rel && sha256sum * > SHA256SUMS && cat SHA256SUMS)
+          gh release create "$TAG" rel/* -R "$GITHUB_REPOSITORY" --title "SubStore HO $V" --notes-file notes.md --latest
