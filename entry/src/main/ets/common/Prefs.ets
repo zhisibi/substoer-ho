@@ -1,4 +1,4 @@
-/** Plain (non-secret) settings and lists, stored with @kit.ArkData preferences. Secrets live in SecretStore. */
+/** Plain (non-secret) settings and lists, stored with @kit.ArkData preferences. */
 import { preferences } from '@kit.ArkData';
 import { common } from '@kit.AbilityKit';
 import { Log } from './Log';
@@ -7,7 +7,7 @@ export class Prefs {
   private sp: preferences.Preferences;
 
   constructor(ctx: common.Context) {
-    const opts: preferences.Options = { name: 'mimisub' };
+    const opts: preferences.Options = { name: 'substore-ho' };
     this.sp = preferences.getPreferencesSync(ctx, opts);
   }
 

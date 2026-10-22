@@ -178,7 +178,7 @@ func (e *Engine) setup(vm *goja.Runtime, script []byte) error {
 		return p
 	})
 	g.Set("$Plugins", plugins)
-	g.Set("$Plugin", map[string]interface{}{"name": "MimiSubStore"})
+	g.Set("$Plugin", map[string]interface{}{"name": "SubStoreHO"})
 
 	prog, err := goja.Compile("sub-store-hm.js", string(script), false)
 	if err != nil {
@@ -233,7 +233,7 @@ func (e *Engine) doRequest(opts map[string]interface{}) (map[string]interface{},
 		}
 	}
 	if req.Header.Get("User-Agent") == "" {
-		req.Header.Set("User-Agent", "Sub-Store MimiSubStore")
+		req.Header.Set("User-Agent", "Sub-Store")
 	}
 	c := *client
 	c.Timeout = timeout

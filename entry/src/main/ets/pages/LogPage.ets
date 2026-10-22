@@ -9,7 +9,6 @@ import { AccessLine, Server } from '../common/Server';
 import { IconBtn, PageHeader, Segmented } from '../components/Widgets';
 import { FileUtil } from '../common/FileUtil';
 import { fmtBytes } from '../common/Format';
-import { pageBackdrop } from '../components/Backdrop';
 
 const FILTERS: string[] = ['全部', '后端', '访问', '错误'];
 
@@ -83,7 +82,7 @@ export struct LogPage {
       return;
     }
     const d = new Date();
-    const name = 'mimisubstore-' + d.getFullYear() + p2(d.getMonth() + 1) + p2(d.getDate()) + '-' + p2(d.getHours()) +
+    const name = 'substore-ho-' + d.getFullYear() + p2(d.getMonth() + 1) + p2(d.getDate()) + '-' + p2(d.getHours()) +
       p2(d.getMinutes()) + '.log';
     try {
       const saved = await FileUtil.saveTextAs(ctx, name, this.allText() + '\n');
@@ -172,6 +171,5 @@ export struct LogPage {
     }
     .hideTitleBar(true)
     .backgroundColor(this.store.palette().bg)
-    .background(pageBackdrop)
   }
 }

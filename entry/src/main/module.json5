@@ -20,11 +20,6 @@
         "usedScene": { "abilities": ["EntryAbility"], "when": "inuse" }
       },
       {
-        "name": "ohos.permission.ACCESS_BIOMETRIC",
-        "reason": "$string:perm_biometric",
-        "usedScene": { "abilities": ["EntryAbility"], "when": "inuse" }
-      },
-      {
         "name": "ohos.permission.KEEP_BACKGROUND_RUNNING",
         "reason": "$string:perm_bg",
         "usedScene": { "abilities": ["EntryAbility"], "when": "always" }

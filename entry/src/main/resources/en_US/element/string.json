@@ -2,7 +2,7 @@
   "string": [
     {
       "name": "module_desc",
-      "value": "Sub-Store client for HarmonyOS"
+      "value": "Unofficial Sub-Store client for HarmonyOS"
     },
     {
       "name": "EntryAbility_desc",
@@ -10,7 +10,7 @@
     },
     {
       "name": "EntryAbility_label",
-      "value": "MimiSubStore"
+      "value": "SubStore HO"
     },
     {
       "name": "perm_internet",
@@ -26,11 +26,7 @@
     },
     {
       "name": "bg_notice",
-      "value": "MimiSubStore service is running"
-    },
-    {
-      "name": "perm_biometric",
-      "value": "Used to unlock the app with your fingerprint (optional, needs an access password)"
+      "value": "SubStore HO service is running"
     }
   ]
 }

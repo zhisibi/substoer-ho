@@ -1,4 +1,4 @@
-# Follows upstream Sub-Store releases and publishes builds the app can install in 设置 → Sub-Store 更新:
+# Follows upstream Sub-Store releases and publishes builds the app can install in 服务管理 → Sub-Store 更新:
 #   release substore-<backend>-<frontend>: backend.js (patched for the embedded runtime) + web.zip (upstream dist.zip)
 #   release substore-latest:               manifest.json (versions, absolute URLs, sha256, hostApi, minCore)
 # The backend is built with core/substore/prepare.sh (same patches as the bundled copy) and must pass
@@ -108,8 +108,8 @@ jobs:
           json.dump(m, open('out/manifest.json', 'w'), indent=2)
           print(json.dumps(m, indent=2))
           PY
-          NOTES="Sub-Store backend $B (patched for 咪咪SubStore's embedded runtime) + Sub-Store-Front-End $F.
-          Built from https://github.com/sub-store-org/Sub-Store/releases/tag/$B and https://github.com/sub-store-org/Sub-Store-Front-End/releases/tag/$F; installed by the app in 设置 → Sub-Store 更新."
+          NOTES="Sub-Store backend $B (patched for SubStore HO's embedded runtime) + Sub-Store-Front-End $F.
+          Built from https://github.com/sub-store-org/Sub-Store/releases/tag/$B and https://github.com/sub-store-org/Sub-Store-Front-End/releases/tag/$F; installed by the app in 服务管理 → Sub-Store 更新."
           gh release delete "$REL" -y --cleanup-tag 2>/dev/null || true
           gh release create "$REL" out/backend.js out/web.zip out/manifest.json --title "Sub-Store $B / Front-End $F" --notes "$NOTES" --latest=false
           gh release view substore-latest >/dev/null 2>&1 || \

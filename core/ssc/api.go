@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	CoreVersion     = "1.1.0"
+	CoreVersion     = "1.2.0"
 	BackendVersion  = "2.42.6" // sub-store-org/Sub-Store backend (bundled, patched express adapter)
 	FrontendVersion = "2.34.1" // sub-store-org/Sub-Store-Front-End dist
 )
@@ -59,6 +59,7 @@ func errOut(err error) string { return jsonOut(map[string]string{"error": err.Er
 //	{op:"updCheck",dir,url?,mirrors}                → UpdateInfo | {error}   (callAsync: network)
 //	{op:"updInstall",dir,url?,mirrors,part?,force?} → UpdateInfo | {error}   (then stop + start the service)
 //	{op:"updRollback",dir,part?}                    → UpdateInfo
+//	{op:"appRelease",mirrors}                       → AppRelease (newest v* release of the app on GitHub)
 func Call(js string) string {
 	var r req
 	if err := json.Unmarshal([]byte(js), &r); err != nil {
@@ -107,6 +108,12 @@ func Call(js string) string {
 			return errOut(err)
 		}
 		return jsonOut(info)
+	case "appRelease":
+		rel, err := LatestAppRelease(r.Mirrors)
+		if err != nil {
+			return errOut(err)
+		}
+		return jsonOut(rel)
 	case "updRollback":
 		return jsonOut(S.UpdateRollback(r.Dir, r.Part))
 	case "storeSize":

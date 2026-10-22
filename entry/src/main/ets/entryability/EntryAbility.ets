@@ -1,13 +1,12 @@
-/** Ability lifecycle: initialise Store and Server, window insets, color mode, optional server autostart, app lock. */
+/** Ability lifecycle: initialise Store and Server, window insets, color mode, optional server autostart. */
 import { SsUpdate } from '../common/SsUpdate';
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want, Configuration } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { Store } from '../common/Store';
 import { Server } from '../common/Server';
-import { AppLock } from '../common/AppLock';
 import { Log } from '../common/Log';
-import { tf, t } from '../common/I18n';
+import { t } from '../common/I18n';
 
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
@@ -59,13 +58,11 @@ export default class EntryAbility extends UIAbility {
   }
 
   onForeground(): void {
-    AppLock.get().onForeground();
     Store.get().foreground = true;
     Server.get().onForeground();
   }
 
   onBackground(): void {
-    AppLock.get().onBackground();
     Store.get().foreground = false;
     if (Server.get().running && !Server.get().bgActive) {
       Log.i('Ability', t('后台运行未开启'));

@@ -1,0 +1,47 @@
+# Publishes the app release for a tag v<version>: the HAP and the native core are taken from the `dist` branch
+# (app/v<version>/, core/v<version>/), release notes from docs/CHANGELOG.md. The app's 关于 › 检查更新 reads these
+# releases (GitHub API, newest non-prerelease v* tag).
+name: App release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to (re)publish, e.g. v1.2.0'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ inputs.tag || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+      - name: Collect files from dist
+        run: |
+          set -e
+          V="${TAG#v}"
+          git fetch --depth 1 origin dist
+          mkdir -p out
+          for d in "app/v$V" "core/v$V"; do
+            git archive origin/dist "$d" | tar -x -C out || true
+          done
+          find out -type f | sort
+          ls out/app/v$V/*.hap >/dev/null
+          # notes: the section of docs/CHANGELOG.md for this version
+          awk -v v="## $V" '$0==v{f=1;next} /^## /{f=0} f' docs/CHANGELOG.md > notes.md
+          printf '\n\n源代码：AGPL-3.0，见本仓库。安装包未签名，需要自行签名后安装（见 README）。\n' >> notes.md
+          cat notes.md
+      - name: Publish
+        run: |
+          V="${TAG#v}"
+          gh release delete "$TAG" -y 2>/dev/null || true
+          gh release create "$TAG" out/app/v$V/* out/core/v$V/* --title "SubStore HO $V" --notes-file notes.md --verify-tag --latest

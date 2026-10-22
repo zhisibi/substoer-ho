@@ -45,7 +45,7 @@ export class WebHolder {
   }
 }
 
-/** Host object exposed to the page as window.MimiHost (clipboard bridge). */
+/** Host object exposed to the page as window.SubStoreHost (clipboard bridge). */
 class HostBridge {
   copy(text: string): boolean {
     try {
@@ -60,7 +60,7 @@ class HostBridge {
 const CLIPBOARD_JS: string = `
 (function(){
   try {
-    var host = window.MimiHost;
+    var host = window.SubStoreHost;
     if (!host) return;
     var write = function(t){ return host.copy(String(t)) ? Promise.resolve() : Promise.reject(new Error('copy failed')); };
     if (!navigator.clipboard) { Object.defineProperty(navigator, 'clipboard', { value: {}, configurable: true }); }
@@ -207,10 +207,10 @@ export struct StoreView {
         .overScrollMode(OverScrollMode.NEVER)
         .darkMode(this.store.isDark() ? WebDarkMode.On : WebDarkMode.Off)
         .forceDarkAccess(false)
-        .backgroundColor(this.store.isDark() ? '#000000' : '#F2F2F2')
+        .backgroundColor(this.store.isDark() ? '#121212' : '#F4F4F4')
         .javaScriptProxy({
           object: this.bridge,
-          name: 'MimiHost',
+          name: 'SubStoreHost',
           methodList: ['copy'],
           controller: WebHolder.controller
         })
@@ -294,12 +294,12 @@ export struct StoreView {
         .width('100%')
         .height('100%')
         .justifyContent(FlexAlign.Center)
-        .backgroundColor(this.store.isDark() ? '#000000' : '#F2F2F2')
+        .backgroundColor(this.store.isDark() ? '#121212' : '#F4F4F4')
       }
     }
     .width('100%')
     .height('100%')
     .padding({ top: this.store.safeTop, bottom: this.store.safeBottom })
-    .backgroundColor(this.store.isDark() ? '#000000' : '#F2F2F2')
+    .backgroundColor(this.store.isDark() ? '#121212' : '#F4F4F4')
   }
 }

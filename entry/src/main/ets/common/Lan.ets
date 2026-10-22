@@ -1,4 +1,4 @@
-/** Lan.ets: picks the LAN IPv4 addresses to offer for subscription links (from MimiSub). */
+/** Lan.ets: picks the LAN IPv4 addresses to offer for subscription links . */
 // ------------------------------------------------------------------ LAN addresses
 
 /**

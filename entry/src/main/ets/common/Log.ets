@@ -3,7 +3,7 @@
  *
  * 职责：在 hilog 之上封装 d/i/w/e 四个级别的日志输出，并提供异常描述与敏感信息脱敏工具。
  * 主要类型：Log（只含静态方法）。
- * 与其他模块的关系：几乎所有模块（QlApi、Store、SecretStore、Prefs、CrashLog、Updater 等）都通过它写日志。
+ * 与其他模块的关系：几乎所有模块（Store、Server、Prefs 等）都通过它写日志。
  * 安全约定：任何密码、令牌（token）、Client Secret 都不允许原样写入日志，必要时用 Log.mask() 脱敏。
  */
 import { hilog } from '@kit.PerformanceAnalysisKit';
@@ -11,13 +11,13 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 /**
  * Unified logging on top of hilog.
  *
- * - Domain 0x4C4C ("LL"), tag "MimiSubStore"; filter with `hdc hilog -T MimiSubStore`.
+ * - Domain 0x4C4C ("LL"), tag "SubStoreHO"; filter with `hdc hilog -T SubStoreHO`.
  * - Never pass passwords, tokens or client secrets here. Use Log.mask() for anything that might contain one.
  * - Debug lines are dropped in release builds by hilog itself (DEBUG level is off by default on user devices).
  */
 // hilog 业务域 0x4C4C，即 ASCII 的 "LL"（历史值），便于在系统日志中过滤
 const DOMAIN: number = 0x4C4C;
-const TAG: string = 'MimiSubStore';
+const TAG: string = 'SubStoreHO';
 
 /**
  * 日志门面类。所有方法都是静态的，直接 Log.i('Scope', 'msg') 调用即可。

@@ -6,7 +6,7 @@ index 998ab02..4e7aa27 100644
  }
  
  function parse(content, options) {
-+    // 咪咪SubStore: native (Go yaml.v3) parse in the embedded runtime; the JS parser is ~10x slower there
++    // SubStore HO: native (Go yaml.v3) parse in the embedded runtime; the JS parser is ~10x slower there
 +    if (
 +        typeof globalThis !== 'undefined' &&
 +        typeof globalThis.__hm_yamlParse === 'function' &&

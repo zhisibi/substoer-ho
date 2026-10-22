@@ -149,18 +149,6 @@ export class Server {
     return b + '/?api=' + encodeURIComponent(b);
   }
 
-  /** Every base URL subscription links can be fetched from: 127.0.0.1 first, then each LAN address. */
-  bases(): string[] {
-    const store = Store.get();
-    const out: string[] = [this.localBase()];
-    if (store.lanAccess) {
-      for (const ip of this.ips) {
-        out.push('http://' + ip + ':' + store.port);
-      }
-    }
-    return out;
-  }
-
   dataDir(): string {
     const ctx = Store.get().ctx;
     return ctx !== null ? ctx.filesDir + '/substore' : '';
@@ -264,12 +252,6 @@ export class Server {
       this.logs = all.length > 2000 ? all.slice(all.length - 2000) : all;
       this.seq = jNum(res, 'seq');
     }
-  }
-
-  /** The newest lines for the 服务 page (the full list is on the 完整日志 page). */
-  recentLogs(): AccessLine[] {
-    const l = this.logs;
-    return l.length > 300 ? l.slice(l.length - 300) : l;
   }
 
   clearLogs(): void {

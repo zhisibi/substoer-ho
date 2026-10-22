@@ -1,18 +1,29 @@
-# 咪咪SubStore · Sub-Store for HarmonyOS
+# SubStore HO · Sub-Store for HarmonyOS
 
-HarmonyOS NEXT 上的 [Sub-Store](https://github.com/sub-store-org/Sub-Store) 客户端：Sub-Store 后端和管理界面都在手机本地运行，不需要服务器，也不需要 Node.js。
+[Sub-Store](https://github.com/sub-store-org/Sub-Store) 的**第三方、非官方** HarmonyOS NEXT 客户端：Sub-Store 后端和管理界面都在手机本地运行，不需要服务器，也不需要 Node.js。
 
-- 包名 `com.zhisibi.mimisubstore`，当前版本 1.1.0（versionCode 1001000），开发者张世博
-- 安装包内置 Sub-Store 后端 2.42.6、前端 2.34.1；之后可在 app 里一键更新到上游最新版（见下文“组件更新”）
+> **本项目由 AI（Hark Agent）开发。** 代码未经专业安全审计，按“现状”提供、不作任何担保，请阅读 [免责声明](docs/disclaimer.md)。与 Sub-Store 项目及其作者无隶属或授权关系。
+
+- 当前版本 1.2.0（versionCode 1002000）；包名 `com.zhisibi.mimisubstore`（沿用，便于升级覆盖安装）
+- 安装包内置 Sub-Store 后端 2.42.6、前端 2.34.1；之后可在 app 里一键更新到上游最新版（见“组件更新”）
 - 本应用只是本地工具，不提供任何代理服务器、节点、订阅或 VPN 服务
+- 下载：[Releases](https://github.com/zhisibi/substoer-ho/releases)（未签名 HAP，需要用自己的证书签名后安装）
 
 ## 功能
 
-| 页面 | 内容 |
+打开应用就是原版 Sub-Store 管理界面（ArkWeb 打开 `http://127.0.0.1:<端口>/?api=<同地址>`）；外部链接和 `clash://`、`sing-box://` 等导入链接交给系统，文件选择、下载“另存为”、剪贴板都接到系统能力。右下角的按钮进入**服务管理**（配色与 Sub-Store 前端一致，跟随系统深浅色）：
+
+| 分组 | 内容 |
 | --- | --- |
-| Sub-Store | 默认首页，就是原版 Sub-Store 管理界面（ArkWeb 打开 `http://127.0.0.1:<端口>/?api=<同地址>`）。外部链接和 `clash://`、`sing-box://` 等导入链接交给系统；文件选择、下载“另存为”、剪贴板都接到系统能力 |
-| 服务 | 电源按钮、本机 / 局域网订阅地址、端口、局域网访问、局域网管理界面、后台运行、打开应用自动启动、运行日志；“完整日志”页可按后端 / 访问 / 错误筛选，一键复制全部或保存为 .log |
-| 设置 | Sub-Store 更新、访问密码与指纹、外观、语言、清除全部数据、关于与开源许可 |
+| 服务 | 启动 / 停止、运行时长与请求数、本机与局域网地址（点按复制） |
+| 端口与访问控制 | 端口、允许局域网访问、局域网也可打开管理界面 |
+| 后台与自动启动 | 后台继续运行（长时任务）、打开应用时自动启动服务 |
+| 语言 | 跟随系统 / 中文 / English |
+| Sub-Store 更新 | 后端与前端版本、检查 / 立即更新、恢复内置版本、下载线路、启动时检查 |
+| 日志与声明 | 完整运行日志（筛选、复制、保存 .log）、免责声明 |
+| 关于 | 版本、开发者 Hark Agent、仓库地址、检查应用更新（GitHub Release）、上游项目、免责声明与隐私说明、开源许可、清除数据、撤回同意 |
+
+首次启动需同意《免责声明与隐私说明》（应用不上架，故不再单设用户协议和隐私政策）；之后每次启动都会弹出该声明，可勾选“不再提示”（声明更新后会再次提示）。
 
 访问控制：默认只监听 `127.0.0.1:3000`。开启“允许局域网访问”后其他设备只能访问订阅链接（`/download`、`/share`）；再开启“局域网也可打开管理界面”才放行管理界面和 `/api`（Sub-Store 后端没有登录验证，界面会二次确认）。
 
@@ -37,7 +48,7 @@ ArkWeb (Sub-Store-Front-End)  ──HTTP──▶  Go net/http 127.0.0.1:3000   
 
 ## 组件更新（不用重装 app）
 
-Sub-Store 更新很频繁，所以后端和前端可以在 **设置 → Sub-Store 更新** 里单独更新：
+Sub-Store 更新很频繁，所以后端和前端可以在 **服务管理 → Sub-Store 更新** 里单独更新：
 
 1. 本仓库的 GitHub Actions（`.github/workflows/substore-assets.yml`）每 6 小时检查 [Sub-Store](https://github.com/sub-store-org/Sub-Store/releases) 和 [Sub-Store-Front-End](https://github.com/sub-store-org/Sub-Store-Front-End/releases) 的最新正式版；
 2. 有新版本就用 `core/substore/prepare.sh`（和安装包同一套补丁）构建后端，`core/substore/smoke.sh` 冒烟测试（网页、建本地 / 远程订阅、下载 ClashMeta、sing-box、Surge、QX、Loon、V2Ray）；
@@ -52,6 +63,12 @@ app 端（`core/ssc/update.go` + `entry/.../common/SsUpdate.ets`）：
 - “启动时检查更新”默认开启，每天最多检查一次。
 
 手动触发构建：Actions → Sub-Store assets → Run workflow（可指定上游 tag，或勾选 force 重建）。注意 GitHub 会在仓库 60 天无提交后暂停定时任务，届时手动运行一次即可恢复。
+
+## 发布应用版本
+
+1. 改 `AppScope/app.json5` 的版本号（`CoreVersion` 变了就同时改 `core/ssc/api.go` 与 `AppInfo.ets` 的 `CORE_VERSION`），在 `docs/CHANGELOG.md` 写一节 `## <版本>`；
+2. 把 HAP 放进 `dist` 分支的 `app/v<版本>/`、内核放进 `core/v<版本>/`（以及 `core/latest/`）；
+3. 推送标签 `v<版本>`，`.github/workflows/app-release.yml` 自动创建 Release。app 的“关于 → 检查更新”读取最新的 `v*` Release。
 
 ## 构建
 
@@ -79,8 +96,9 @@ core/                 Go 内核（NAPI：napi.c + main.go）
   ssc/assets/         内置的 backend.js 与前端 web/（prepare.sh 生成）
   substore/           prepare.sh、substore-hm.patch、sub-store-hm.js、build-hm.js、smoke.sh
   cmd/hostrun/        主机测试服务器
-entry/src/main/ets/   ArkTS：views（Sub-Store / 服务 / 设置）、pages（完整日志、Sub-Store 更新、协议…）、common
-docs/                 隐私政策、用户协议、开源许可（scripts/gen-legal.py 生成到 rawfile）
+entry/src/main/ets/   ArkTS：views/StoreView（Sub-Store 网页）、pages（Index、ManagePage 服务管理、LogPage、MiscPages 协议与许可）、common
+docs/                 隐私政策、用户协议、免责声明、开源许可、更新日志（scripts/gen-legal.py 生成 LegalText.ets）
+icon-src/             图标生成脚本 make_icon.py
 i18n/                 中英文案（scripts/gen-i18n.py）
 ```
 
@@ -88,5 +106,6 @@ i18n/                 中英文案（scripts/gen-i18n.py）
 
 - Sub-Store 后端：[AGPL-3.0](https://github.com/sub-store-org/Sub-Store/blob/master/LICENSE)；Sub-Store 前端：[GPL-3.0](https://github.com/sub-store-org/Sub-Store-Front-End/blob/master/LICENSE)。
 - 本仓库包含本应用对 Sub-Store 的全部修改和构建脚本（AGPL-3.0 要求的对应源代码）；其余第三方组件见 `docs/licenses/`。
-- 本仓库代码以 AGPL-3.0 发布（见 `LICENSE`）。
-- 联系：zhisibi@gmail.com
+- 本仓库代码以 AGPL-3.0 发布（见 `LICENSE`）。应用内“关于 → 开源许可”列出全部组件及许可证全文，并给出本仓库地址作为对应源代码。
+- Sub-Store 名称及其后端、前端的权利归 Sub-Store 项目及其贡献者所有；本项目为第三方移植，不代表官方。
+- 开发者：Hark Agent（AI）。问题反馈：[Issues](https://github.com/zhisibi/substoer-ho/issues)

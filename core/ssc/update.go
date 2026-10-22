@@ -143,7 +143,7 @@ func fetch(url string, mirrors []string, max int64) ([]byte, string, error) {
 			u = strings.TrimRight(m, "/") + "/" + url
 		}
 		req, _ := http.NewRequest(http.MethodGet, u, nil)
-		req.Header.Set("User-Agent", "MimiSubStore/"+CoreVersion)
+		req.Header.Set("User-Agent", "SubStoreHO/"+CoreVersion)
 		res, err := updClient.Do(req)
 		if err != nil {
 			lastErr = err
@@ -409,4 +409,62 @@ func (s *server) UpdateRollback(dataDir, part string) UpdateInfo {
 	}
 	s.Event("info", "restored built-in Sub-Store "+part)
 	return localInfo(dataDir)
+}
+
+// AppReleasesURL lists the app's own releases (tags v<version>; substore-* tags are component builds).
+const AppReleasesURL = "https://api.github.com/repos/zhisibi/substoer-ho/releases?per_page=30"
+
+type AppAsset struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
+	Size int64  `json:"size"`
+}
+
+type AppRelease struct {
+	Version   string     `json:"version"`
+	Name      string     `json:"name"`
+	Notes     string     `json:"notes"`
+	URL       string     `json:"url"`
+	Published string     `json:"published"`
+	Assets    []AppAsset `json:"assets"`
+}
+
+// LatestAppRelease returns the newest published v* release of the app ({version:""} when there is none).
+func LatestAppRelease(mirrors []string) (AppRelease, error) {
+	var out AppRelease
+	b, _, err := fetch(AppReleasesURL, mirrors, 4<<20)
+	if err != nil {
+		return out, err
+	}
+	var rels []struct {
+		Tag        string `json:"tag_name"`
+		Name       string `json:"name"`
+		Body       string `json:"body"`
+		HTML       string `json:"html_url"`
+		Draft      bool   `json:"draft"`
+		Prerelease bool   `json:"prerelease"`
+		Published  string `json:"published_at"`
+		Assets     []struct {
+			Name string `json:"name"`
+			URL  string `json:"browser_download_url"`
+			Size int64  `json:"size"`
+		} `json:"assets"`
+	}
+	if err := json.Unmarshal(b, &rels); err != nil {
+		return out, err
+	}
+	for _, r := range rels {
+		if r.Draft || r.Prerelease || !strings.HasPrefix(r.Tag, "v") {
+			continue
+		}
+		v := strings.TrimPrefix(r.Tag, "v")
+		if out.Version != "" && !verNewer(v, out.Version) {
+			continue
+		}
+		out = AppRelease{Version: v, Name: r.Name, Notes: r.Body, URL: r.HTML, Published: r.Published}
+		for _, a := range r.Assets {
+			out.Assets = append(out.Assets, AppAsset{Name: a.Name, URL: a.URL, Size: a.Size})
+		}
+	}
+	return out, nil
 }

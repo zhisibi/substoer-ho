@@ -16,6 +16,7 @@
 
   gen-i18n.py           regenerate entry/src/main/ets/common/LangEn.ets from i18n/zh.txt + i18n/en.txt
   gen-i18n.py --check   list t()/tf() strings in the sources that have no English entry (exit 1 if any)
+  gen-i18n.py --prune   drop entries no source file uses any more
 
 i18n/zh.txt and i18n/en.txt are line-aligned: line N of en.txt translates line N of zh.txt. Lines are written
 exactly as the string literal appears in the .ets source (escapes such as \\n kept as typed).
@@ -57,6 +58,21 @@ if '--check' in sys.argv:
         print('missing:', m)
     print('%d strings, %d missing' % (len(zh), len(missing)))
     sys.exit(1 if missing else 0)
+
+
+# 清理模式：删除源码里已不再出现的字符串（以单引号字面量出现在任一 .ets 或 docs/licenses/index.json 中即保留）
+if '--prune' in sys.argv:
+    blob = ''
+    for root, _, fs in os.walk(SRC):
+        for f in fs:
+            if f.endswith('.ets') and f != 'LangEn.ets':
+                blob += open(os.path.join(root, f), encoding='utf-8').read()
+    lic = open(os.path.join(ROOT, 'docs/licenses/index.json'), encoding='utf-8').read()
+    keep = [(a, b) for a, b in zip(zh, en) if ("'" + a + "'") in blob or ('"' + a + '"') in lic]
+    open(os.path.join(ROOT, 'i18n/zh.txt'), 'w', encoding='utf-8').write(''.join(a + '\n' for a, _ in keep))
+    open(os.path.join(ROOT, 'i18n/en.txt'), 'w', encoding='utf-8').write(''.join(b + '\n' for _, b in keep))
+    print('pruned %d -> %d' % (len(zh), len(keep)))
+    sys.exit(0)
 
 
 def q(s):

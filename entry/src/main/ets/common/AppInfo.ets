@@ -1,20 +1,22 @@
-/** Fixed app facts shown in Settings › About and used by the legal pages. */
+/** Fixed app facts shown in 服务管理 › 关于 and used by the legal pages. */
 import { bundleManager } from '@kit.AbilityKit';
 
-export const DEVELOPER: string = '张世博';
-export const CONTACT_EMAIL: string = 'zhisibi@gmail.com';
-/** Published on the 猫Mo家族 site (zh pages; *_en.html for English) */
-export const PRIVACY_URL: string = 'https://aimm.886423.xyz/cats/mimisubstore/privacy.html';
-export const TERMS_URL: string = 'https://aimm.886423.xyz/cats/mimisubstore/terms.html';
-export const PRIVACY_URL_EN: string = 'https://aimm.886423.xyz/cats/mimisubstore/privacy_en.html';
-export const TERMS_URL_EN: string = 'https://aimm.886423.xyz/cats/mimisubstore/terms_en.html';
+export const APP_NAME: string = 'SubStore HO';
+export const DEVELOPER: string = 'Hark Agent';
+/** Source code (AGPL-3.0), releases, issues */
+export const REPO_URL: string = 'https://github.com/zhisibi/substoer-ho';
+export const REPO_NAME: string = 'github.com/zhisibi/substoer-ho';
+/** The same disclaimer & privacy notice, published with the source */
+export const DISCLAIMER_URL: string = 'https://github.com/zhisibi/substoer-ho/blob/main/docs/disclaimer.md';
+export const DISCLAIMER_URL_EN: string = 'https://github.com/zhisibi/substoer-ho/blob/main/docs/disclaimer.en.md';
+export const UPSTREAM_URL: string = 'https://github.com/sub-store-org/Sub-Store';
 /** Version of libmimisubstore.so this app expects (core/ssc CoreVersion) */
-export const CORE_VERSION: string = '1.1.0';
+export const CORE_VERSION: string = '1.2.0';
 export const DEFAULT_PORT: number = 3000;
 
 let cachedVersion: string = '';
 
-/** versionName from the installed bundle, e.g. "1.0.0" */
+/** versionName from the installed bundle, e.g. "1.2.0" */
 export function versionName(): string {
   if (cachedVersion.length > 0) {
     return cachedVersion;

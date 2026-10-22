@@ -28,14 +28,6 @@ export class CoreApi {
     return jStr(CoreApi.versionObj(), 'core');
   }
 
-  static backendVersion(): string {
-    return jStr(CoreApi.versionObj(), 'backend');
-  }
-
-  static frontendVersion(): string {
-    return jStr(CoreApi.versionObj(), 'frontend');
-  }
-
   static call(req: JObj): JObj {
     try {
       const o = parseJsonObj(core.call(JSON.stringify(req)));
@@ -48,15 +40,6 @@ export class CoreApi {
     const err: JObj = {};
     err['error'] = 'core missing';
     return err;
-  }
-
-  /** Same as call but returns arrays too (status list). */
-  static callRaw(req: JObj): string {
-    try {
-      return core.call(JSON.stringify(req));
-    } catch (e) {
-      return '';
-    }
   }
 
   static async callAsync(req: JObj): Promise<JObj> {

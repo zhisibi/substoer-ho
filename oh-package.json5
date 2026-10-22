@@ -1,6 +1,6 @@
 {
   "modelVersion": "6.0.0",
-  "description": "咪咪Sub (MimiSub): HarmonyOS proxy node & subscription manager",
+  "description": "SubStore HO: unofficial Sub-Store client for HarmonyOS",
   "dependencies": {},
   "devDependencies": {}
 }

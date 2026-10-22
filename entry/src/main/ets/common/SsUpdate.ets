@@ -11,6 +11,7 @@ import { JObj, asObj, jBool, jStr } from './Json';
 import { Store } from './Store';
 import { Server } from './Server';
 import { WebHolder } from '../views/StoreView';
+import { versionName } from './AppInfo';
 
 /** 下载线路: 0 自动 (GitHub first, then mirrors), 1 GitHub only, 2 mirrors first */
 export const LINES: string[] = ['自动', '直连 GitHub', '加速镜像优先'];
@@ -197,8 +198,67 @@ export class SsUpdate {
       return;
     }
     if (await this.check(true) && this.hasNew()) {
-      Store.get().toast(tf('Sub-Store 有新版本：后端 {0} · 前端 {1}，可在 设置 → Sub-Store 更新 安装',
+      Store.get().toast(tf('Sub-Store 有新版本：后端 {0} · 前端 {1}，可在 服务管理 → Sub-Store 更新 安装',
         this.latestBackend, this.latestFrontend));
     }
   }
+
+  @Trace appChecking: boolean = false;
+
+  /** 关于 › 检查更新: the newest v* release of this app on GitHub; offers to open its page. */
+  async checkApp(): Promise<void> {
+    if (this.appChecking) {
+      return;
+    }
+    const store = Store.get();
+    this.appChecking = true;
+    let o: JObj = {};
+    try {
+      const q = req('appRelease');
+      q['mirrors'] = this.mirrors();
+      o = await CoreApi.callAsync(q);
+    } finally {
+      this.appChecking = false;
+    }
+    const err = jStr(o, 'error');
+    if (err.length > 0) {
+      store.toast(tf('检查失败：{0}', err));
+      return;
+    }
+    const v = jStr(o, 'version');
+    if (v.length === 0) {
+      store.toast(t('还没有发布版本'));
+      return;
+    }
+    if (!verNewer(v, versionName())) {
+      store.toast(tf('已是最新版本（{0}）', versionName()));
+      return;
+    }
+    let notes = jStr(o, 'notes').trim();
+    if (notes.length > 600) {
+      notes = notes.substring(0, 600) + '…';
+    }
+    const ok = await store.confirm(tf('发现新版本 {0}', v), (notes.length > 0 ? notes + '\n\n' : '') +
+      tf('当前版本 {0}。前往 GitHub Release 下载安装包。', versionName()), t('前往下载'), false);
+    const url = jStr(o, 'url');
+    if (ok && url.length > 0) {
+      store.ctx?.openLink(url, { appLinkingOnly: false });
+    }
+  }
+}
+
+/** a > b for dotted numeric versions */
+export function verNewer(a: string, b: string): boolean {
+  const pa = a.replace(/^v/, '').split('.');
+  const pb = b.replace(/^v/, '').split('.');
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const x = i < pa.length ? parseInt(pa[i], 10) : 0;
+    const y = i < pb.length ? parseInt(pb[i], 10) : 0;
+    const xa = isNaN(x) ? 0 : x;
+    const ya = isNaN(y) ? 0 : y;
+    if (xa !== ya) {
+      return xa > ya;
+    }
+  }
+  return false;
 }

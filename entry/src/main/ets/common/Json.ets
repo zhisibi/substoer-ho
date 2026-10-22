@@ -5,8 +5,8 @@
  *       并通过 jStr/jNum/jBool/jObj/jArr 等带默认值的访问器读取字段，避免类型错误与空指针。
  * 主要导出：JObj 类型；jGet/jHas；asStr/jStr；asNum/jNum/jNumOr；jBool；asObj/jObj；asArr/jArr/jStrArr；
  *           parseJson/parseJsonObj。
- * 与其他模块的关系：Models 的 fromJson()、QlApi 的响应解析、Prefs 的服务器列表都依赖这里。
- * 设计取舍：青龙不同版本字段类型并不稳定（数字有时是字符串、布尔有时是 0/1），所以访问器都做宽松转换。
+ * 与其他模块的关系：内核 JSON 响应（Core / Server / SsUpdate）的解析都依赖这里。
+ * 设计取舍：访问器都做宽松类型转换（数字字符串、0/1 布尔等）。
  */
 /**
  * JSON helpers. ArkTS has no `any`, so parsed JSON objects are handled as Record<string, Object>
@@ -30,15 +30,6 @@ export function jGet(o: JObj | undefined | null, k: string): Object | undefined 
     return undefined;
   }
   return v;
-}
-
-/**
- * 字段是否存在且非 null。
- * @param o 对象
- * @param k 字段名
- */
-export function jHas(o: JObj | undefined | null, k: string): boolean {
-  return jGet(o, k) !== undefined;
 }
 
 /**
@@ -99,18 +90,6 @@ export function jNum(o: JObj | undefined | null, k: string): number {
   return asNum(jGet(o, k));
 }
 
-/** Number field that may be missing: returns `def` when absent */
-/**
- * 读取可能缺失的数字字段（区分“缺失”与“值为 0”）。
- * @param o 对象
- * @param k 字段名
- * @param def 字段缺失时的默认值
- */
-export function jNumOr(o: JObj | undefined | null, k: string, def: number): number {
-  const v = jGet(o, k);
-  return v === undefined ? def : asNum(v);
-}
-
 /**
  * 读取布尔字段，兼容 true/false、非 0 数字、'true'/'1' 字符串。
  * @param o 对象
@@ -150,16 +129,6 @@ export function asObj(v: Object | undefined | null): JObj | undefined {
 }
 
 /**
- * 读取子对象字段。
- * @param o 对象
- * @param k 字段名
- * @returns 子对象或 undefined
- */
-export function jObj(o: JObj | undefined | null, k: string): JObj | undefined {
-  return asObj(jGet(o, k));
-}
-
-/**
  * 把值转换为数组。
  * @param v 任意值
  * @returns 是数组则返回，否则返回空数组（方便直接 for-of）
@@ -181,22 +150,6 @@ export function asArr(v: Object | undefined | null): Object[] {
  */
 export function jArr(o: JObj | undefined | null, k: string): Object[] {
   return asArr(jGet(o, k));
-}
-
-/** Array of strings (non-string entries are skipped) */
-/**
- * 读取字符串数组字段（如 labels），自动跳过非字符串元素。
- * @param o 对象
- * @param k 字段名
- */
-export function jStrArr(o: JObj | undefined | null, k: string): string[] {
-  const out: string[] = [];
-  for (const e of jArr(o, k)) {
-    if (typeof e === 'string') {
-      out.push(e as string);
-    }
-  }
-  return out;
 }
 
 /** Parses text; returns undefined instead of throwing */
@@ -226,17 +179,6 @@ export function parseJsonObj(text: string): JObj | undefined {
   return asObj(parseJson(text));
 }
 
-/** Plain record (AppLock persistence). */
+/** Plain record. */
 export type JRec = Record<string, Object>;
 
-export function parseRec(text: string): JRec | undefined {
-  try {
-    const v = JSON.parse(text) as Object;
-    if (v !== null && typeof v === 'object' && !Array.isArray(v)) {
-      return v as JRec;
-    }
-  } catch (e) {
-    return undefined;
-  }
-  return undefined;
-}

@@ -2,7 +2,7 @@
   "string": [
     {
       "name": "module_desc",
-      "value": "Sub-Store 鸿蒙客户端"
+      "value": "Sub-Store 第三方鸿蒙客户端（非官方）"
     },
     {
       "name": "EntryAbility_desc",
@@ -10,7 +10,7 @@
     },
     {
       "name": "EntryAbility_label",
-      "value": "咪咪SubStore"
+      "value": "SubStore HO"
     },
     {
       "name": "perm_internet",
@@ -26,11 +26,7 @@
     },
     {
       "name": "bg_notice",
-      "value": "咪咪SubStore 服务运行中"
-    },
-    {
-      "name": "perm_biometric",
-      "value": "用于指纹解锁应用（可选，需先设置访问密码）"
+      "value": "SubStore HO 服务运行中"
     }
   ]
 }

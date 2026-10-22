@@ -100,4 +100,4 @@ static napi_module msModule = {
     .reserved = {0},
 };
 
-__attribute__((constructor)) static void RegisterMimiSubStore(void) { napi_module_register(&msModule); }
+__attribute__((constructor)) static void RegisterModule(void) { napi_module_register(&msModule); }

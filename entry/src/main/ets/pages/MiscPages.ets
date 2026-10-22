@@ -1,12 +1,9 @@
-/** Legal pages (privacy policy, user agreement) and open-source licenses. */
+/** Disclaimer & privacy notice page and open-source licenses. */
 import { isEn, t, tf } from '../common/I18n';
 import { Store } from '../common/Store';
-import {
-  AGREEMENT_LINES, AGREEMENT_LINES_EN, LICENSES, LicenseInfo, PRIVACY_LINES, PRIVACY_LINES_EN
-} from '../common/LegalText';
-import { IconBtn, PageHeader } from '../components/Widgets';
-import { pageBackdrop } from '../components/Backdrop';
-import { PRIVACY_URL, PRIVACY_URL_EN, TERMS_URL, TERMS_URL_EN } from '../common/AppInfo';
+import { DISCLAIMER_LINES, DISCLAIMER_LINES_EN, LICENSES, LicenseInfo } from '../common/LegalText';
+import { PageHeader } from '../components/Widgets';
+import { APP_NAME, DISCLAIMER_URL, DISCLAIMER_URL_EN, REPO_URL } from '../common/AppInfo';
 import { FileUtil } from '../common/FileUtil';
 
 function cells(l: string): string[] {
@@ -73,29 +70,30 @@ export struct LegalText {
 @ComponentV2
 export struct LegalPage {
   private store: Store = Store.get();
-  @Param doc: string = 'privacy';
 
   docUrl(): string {
-    if (this.doc === 'agreement') {
-      return isEn() ? TERMS_URL_EN : TERMS_URL;
-    }
-    return isEn() ? PRIVACY_URL_EN : PRIVACY_URL;
+    return isEn() ? DISCLAIMER_URL_EN : DISCLAIMER_URL;
+  }
+
+  docTitle(): string {
+    return t('免责声明与隐私说明');
+  }
+
+  docLines(): string[] {
+    return isEn() ? DISCLAIMER_LINES_EN : DISCLAIMER_LINES;
   }
 
   build() {
     NavDestination() {
       Column() {
         PageHeader({
-          title: this.doc === 'agreement' ? t('用户协议') : t('隐私政策'), showBack: true, onBack: () => {
+          title: this.docTitle(), showBack: true, onBack: () => {
             this.store.pop();
           }
         })
         Scroll() {
           Column() {
-            LegalText({
-              lines: this.doc === 'agreement' ? (isEn() ? AGREEMENT_LINES_EN : AGREEMENT_LINES) :
-                (isEn() ? PRIVACY_LINES_EN : PRIVACY_LINES)
-            })
+            LegalText({ lines: this.docLines() })
             Text(this.docUrl())
               .fontSize(12)
               .fontColor(this.store.palette().accent)
@@ -119,7 +117,6 @@ export struct LegalPage {
     }
     .hideTitleBar(true)
     .backgroundColor(this.store.palette().bg)
-    .background(pageBackdrop)
   }
 }
 
@@ -168,8 +165,7 @@ export struct LicensesPage {
     .width('100%')
     .padding(14)
     .backgroundColor(this.store.palette().card)
-    .backdropBlur(this.store.blurPx())
-    .borderRadius(16)
+    .borderRadius(12)
     .onClick(() => {
       this.open = this.open === l.name ? '' : l.name;
     })
@@ -185,7 +181,7 @@ export struct LicensesPage {
         })
         Scroll() {
           Column({ space: 10 }) {
-            Text(t('咪咪SubStore 使用了以下开源软件，在此向其作者致谢。点按查看许可证全文。'))
+            Text(tf('{0} 以 AGPL-3.0 开源（源代码：{1}），并使用了以下开源软件，在此向其作者致谢。点按查看许可证全文。', APP_NAME, REPO_URL))
               .fontSize(13)
               .lineHeight(20)
               .fontColor(this.store.palette().subtle)
@@ -208,6 +204,5 @@ export struct LicensesPage {
     }
     .hideTitleBar(true)
     .backgroundColor(this.store.palette().bg)
-    .background(pageBackdrop)
   }
 }
