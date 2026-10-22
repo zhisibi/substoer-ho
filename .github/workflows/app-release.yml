@@ -29,10 +29,10 @@ jobs:
         run: |
           set -e
           V="${TAG#v}"
-          git fetch --depth 1 origin dist
+          git fetch --depth 1 origin +dist:refs/remotes/origin/dist
           mkdir -p out
           for d in "app/v$V" "core/v$V"; do
-            git archive origin/dist "$d" | tar -x -C out || true
+            if git cat-file -e "origin/dist:$d" 2>/dev/null; then git archive origin/dist "$d" | tar -x -C out; fi
           done
           find out -type f | sort
           ls out/app/v$V/*.hap >/dev/null
