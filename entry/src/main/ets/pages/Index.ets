@@ -195,18 +195,18 @@ struct Index {
   fab() {
     Stack({ alignContent: Alignment.TopEnd }) {
       Stack() {
-        SymbolGlyph($r('sys.symbol.gearshape')).fontSize(22).fontColor(['#FFFFFF'])
+        // transparent, same grey as the Sub-Store web UI's inactive tab-bar icons (--lowest-text-color)
+        SymbolGlyph($r('sys.symbol.gearshape')).fontSize(26).fontColor([this.store.palette().disabled])
       }
       .width(48)
       .height(48)
       .borderRadius(24)
-      .linearGradient({ angle: 135, colors: [[this.store.palette().primary, 0], [this.store.palette().primaryEnd, 1]] })
-      .shadow({ radius: 14, color: '#40478EF2', offsetY: 4 })
+      .backgroundColor(Color.Transparent)
       Row()
-        .width(12)
-        .height(12)
-        .borderRadius(6)
-        .border({ width: 2, color: this.store.palette().card })
+        .width(8)
+        .height(8)
+        .borderRadius(4)
+        .margin({ top: 8, right: 8 })
         .backgroundColor(this.srv.running ? this.store.palette().good : this.store.palette().tertiary)
     }
     .width(48)
