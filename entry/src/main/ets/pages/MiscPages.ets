@@ -141,8 +141,8 @@ export struct LegalPage {
     .hideTitleBar(true)
     .backgroundColor(this.store.palette().bg)
     .onReady((ctx: NavDestinationContext) => {
-      const p = ctx.pathInfo.param;
-      if (typeof p === 'string' && p.length > 0) {
+      const p = ctx.pathInfo.param as string | undefined;
+      if (p !== undefined && p.length > 0) {
         this.doc = p;
       }
     })
