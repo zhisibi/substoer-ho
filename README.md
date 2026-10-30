@@ -4,7 +4,7 @@
 
 > **本项目由 AI（Hark Agent）开发。** 代码未经专业安全审计，按“现状”提供、不作任何担保，请阅读 [免责声明](docs/disclaimer.md)。与 Sub-Store 项目及其作者无隶属或授权关系。
 
-- 当前版本 1.3.1（versionCode 1003001）；包名 `com.zhisibi.mimisubstore`（沿用，便于升级覆盖安装）
+- 当前版本 1.3.2（versionCode 1003002）；包名 `com.zhisibi.mimisubstore`（沿用，便于升级覆盖安装）
 - 安装包内置 Sub-Store 后端 2.42.6、前端 2.34.1；之后可在 app 里一键更新到上游最新版（见“组件更新”）
 - 本应用只是本地工具，不提供任何代理服务器、节点、订阅或 VPN 服务
 - 下载：[Releases](https://github.com/zhisibi/substoer-ho/releases)（未签名 HAP，需要用自己的证书签名后安装）

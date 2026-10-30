@@ -61,17 +61,30 @@ export class WebHolder {
 /**
  * 导航栏沉浸光感 for the web UI: the bottom tab bar (.nut-tabbar inside .tab-bar-wrapper) belongs to the
  * web front-end, so the native glass material cannot reach it — when the setting is on, a style sheet is
- * injected that turns the bar translucent with a backdrop blur and a light rim on its top edge.
+ * injected that restyles the bar as a floating glass capsule in the MimiSSH manner: strong backdrop blur
+ * and saturation, a tint gradient, a diagonal specular sheen (::before), and the two-layer light rim
+ * (bright top edge + soft inner glow) that LightSense.GlassRimMod draws natively.
  */
 function glassScript(on: boolean, dark: boolean): string {
-  const bg = dark ? 'rgba(22,24,28,0.55)' : 'rgba(255,255,255,0.55)';
-  const rim = dark ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.65)';
+  const tint = dark ? 'linear-gradient(180deg,rgba(64,70,82,0.42),rgba(24,26,32,0.50))' :
+    'linear-gradient(180deg,rgba(255,255,255,0.50),rgba(255,255,255,0.28))';
+  const rim = dark ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.70)';
+  const rimSoft = dark ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.35)';
+  const sheen = dark ? 'rgba(255,255,255,0.13)' : 'rgba(255,255,255,0.38)';
+  const shadow = dark ? '0 14px 34px rgba(0,0,0,0.42)' : '0 14px 34px rgba(15,23,42,0.16)';
   const css = on ?
     '.tab-bar-wrapper{background:transparent!important}' +
-    '.nut-tabbar{background:' + bg + '!important;' +
-    '-webkit-backdrop-filter:blur(22px) saturate(180%);backdrop-filter:blur(22px) saturate(180%);' +
-    'border-top:1px solid ' + rim + '!important;' +
-    'box-shadow:inset 0 1px 0 ' + rim + ',0 -10px 28px rgba(15,23,42,0.10)!important}' : '';
+    '.nut-tabbar{position:fixed!important;left:14px!important;right:14px!important;width:auto!important;' +
+    'bottom:calc(env(safe-area-inset-bottom, 0px) + 10px)!important;border-radius:30px!important;overflow:hidden!important;' +
+    'background:' + tint + '!important;' +
+    '-webkit-backdrop-filter:blur(30px) saturate(200%) brightness(1.05);' +
+    'backdrop-filter:blur(30px) saturate(200%) brightness(1.05);' +
+    'border:1px solid ' + rimSoft + '!important;' +
+    'box-shadow:inset 0 1px 1px ' + rim + ',inset 0 -1px 1px ' + rimSoft + ',' +
+    'inset 1px 0 1px ' + rimSoft + ',inset -1px 0 1px ' + rimSoft + ',' + shadow + '!important}' +
+    '.nut-tabbar::before{content:"";position:absolute;left:0;top:0;right:0;bottom:0;pointer-events:none;' +
+    'background:linear-gradient(115deg,' + sheen + ' 0%,rgba(255,255,255,0) 42%)}' +
+    '.nut-tabbar-item,.nut-tabbar-item_icon-box{position:relative;z-index:1}' : '';
   return '(function(){try{' +
     'var old=document.getElementById("mss-glass");' +
     (on ? 'var css=' + JSON.stringify(css) + ';' +
