@@ -43,6 +43,42 @@ export class WebHolder {
       Log.w('Web', 'loadUrl failed');
     }
   }
+
+  /** (Re)apply the 沉浸光感 style to the web tab bar from the current settings; safe to call any time. */
+  static applyGlass(): void {
+    if (!WebHolder.attached) {
+      return;
+    }
+    const st = Store.get();
+    try {
+      WebHolder.controller.runJavaScript(glassScript(st.navLight, st.isDark()));
+    } catch (e) {
+      Log.w('Web', 'glass apply failed');
+    }
+  }
+}
+
+/**
+ * 导航栏沉浸光感 for the web UI: the bottom tab bar (.nut-tabbar inside .tab-bar-wrapper) belongs to the
+ * web front-end, so the native glass material cannot reach it — when the setting is on, a style sheet is
+ * injected that turns the bar translucent with a backdrop blur and a light rim on its top edge.
+ */
+function glassScript(on: boolean, dark: boolean): string {
+  const bg = dark ? 'rgba(22,24,28,0.55)' : 'rgba(255,255,255,0.55)';
+  const rim = dark ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.65)';
+  const css = on ?
+    '.tab-bar-wrapper{background:transparent!important}' +
+    '.nut-tabbar{background:' + bg + '!important;' +
+    '-webkit-backdrop-filter:blur(22px) saturate(180%);backdrop-filter:blur(22px) saturate(180%);' +
+    'border-top:1px solid ' + rim + '!important;' +
+    'box-shadow:inset 0 1px 0 ' + rim + ',0 -10px 28px rgba(15,23,42,0.10)!important}' : '';
+  return '(function(){try{' +
+    'var old=document.getElementById("mss-glass");' +
+    (on ? 'var css=' + JSON.stringify(css) + ';' +
+      'if(!old){old=document.createElement("style");old.id="mss-glass";(document.head||document.documentElement).appendChild(old);}' +
+      'if(old.textContent!==css){old.textContent=css;}'
+      : 'if(old){old.remove();}') +
+    '}catch(e){}})();';
 }
 
 /** Host object exposed to the page as window.SubStoreHost (clipboard bridge). */
@@ -250,6 +286,7 @@ export struct StoreView {
         })
         .onPageEnd(() => {
           this.loading = false;
+          WebHolder.applyGlass();
         })
         .onErrorReceive((e: OnErrorReceiveEvent) => {
           if (e.request.isMainFrame()) {

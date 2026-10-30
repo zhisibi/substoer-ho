@@ -175,5 +175,7 @@ export const EN_PAIRS: string[] = [
   '用户协议', 'User Agreement',
   '《隐私政策》', 'Privacy Policy',
   '《用户协议》', 'User Agreement',
-  '与', 'and'
+  '与', 'and',
+  '顶栏呈悬浮玻璃胶囊，网页底部导航栏呈毛玻璃透光效果', 'Floating glass capsule top bar; frosted translucent bottom tab bar in the web UI',
+  '顶栏与网页底部导航栏呈毛玻璃透光效果（此设备不支持系统沉浸材质）', 'Frosted translucent top bar and web bottom tab bar (system immersive material is not supported on this device)'
 ];

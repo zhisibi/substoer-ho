@@ -172,3 +172,5 @@ User Agreement
 Privacy Policy
 User Agreement
 and
+Floating glass capsule top bar; frosted translucent bottom tab bar in the web UI
+Frosted translucent top bar and web bottom tab bar (system immersive material is not supported on this device)

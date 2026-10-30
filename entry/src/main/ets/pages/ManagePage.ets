@@ -13,6 +13,7 @@ import { fmtDuration } from '../common/Format';
 import { APP_NAME, DEFAULT_PORT, DEVELOPER, FEEDBACK_QQ_GROUP, UPSTREAM_URL, versionName } from '../common/AppInfo';
 import { FileUtil } from '../common/FileUtil';
 import { LightSense } from '../common/LightSense';
+import { WebHolder } from '../views/StoreView';
 
 const LANGS: string[] = ['system', 'zh', 'en'];
 const THEMES: string[] = ['system', 'light', 'dark'];
@@ -327,6 +328,7 @@ export struct ManagePage {
           options: [t('跟随系统'), t('浅色'), t('深色')], selected: Math.max(0, THEMES.indexOf(this.store.themeMode)),
           onPick: (i: number) => {
             this.store.setThemeMode(THEMES[i]);
+            WebHolder.applyGlass();
           }
         })
       }
@@ -334,10 +336,11 @@ export struct ManagePage {
       CellDivider()
       SwitchRow({
         title: t('导航栏沉浸光感'),
-        desc: LightSense.material() ? t('页面顶栏使用系统沉浸光感材质，呈悬浮玻璃胶囊效果') :
-          t('页面顶栏使用毛玻璃光感效果，呈悬浮玻璃胶囊效果（此设备不支持系统沉浸材质）'),
+        desc: LightSense.material() ? t('顶栏呈悬浮玻璃胶囊，网页底部导航栏呈毛玻璃透光效果') :
+          t('顶栏与网页底部导航栏呈毛玻璃透光效果（此设备不支持系统沉浸材质）'),
         on: this.store.navLight, onToggle: (v: boolean) => {
           this.store.setNavLight(v);
+          WebHolder.applyGlass();
         }
       })
     }
