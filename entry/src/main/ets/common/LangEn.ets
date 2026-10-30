@@ -190,5 +190,19 @@ export const EN_PAIRS: string[] = [
   '极光', 'Aurora',
   '深海', 'Deep Sea',
   '暮霞', 'Dusk Glow',
-  '林间', 'Forest'
+  '林间', 'Forest',
+  '咪咪SubStore 特别版', 'MimiSubStore Special Edition',
+  '你好，我是本软件的开发者，一名残疾人开发者。开发和维护这款软件不易，需要您的支持：', 'Hello, I am the developer of this app, a developer with a disability. Building and maintaining it is not easy, and I need your support:',
+  '请点击下方按钮，下载安装并好评我的另一款作品《咪咪SSH》；然后联系开发者 QQ，把下面的本机申请码发给他，即可获得邀请码。把邀请码填入下方输入框，即可正常使用本软件。', 'Please tap the button below to download, install and rate my other app "MimiSSH"; then contact the developer on QQ and send him this device\'s request code to receive an invite code. Enter the invite code below to use this app.',
+  '感谢您的理解与支持！', 'Thank you for your understanding and support!',
+  '去下载并好评咪咪SSH', 'Download & rate MimiSSH',
+  '已复制咪咪SSH下载链接', 'MimiSSH download link copied',
+  '本机申请码', 'Request code',
+  '开发者 QQ', 'Developer QQ',
+  '请输入邀请码（如 ABCD-1234）', 'Enter invite code (e.g. ABCD-1234)',
+  '验证并进入', 'Verify & enter',
+  '验证成功，感谢您的支持！', 'Verified — thank you for your support!',
+  '邀请码不正确，请确认后重试', 'Incorrect invite code, please check and try again',
+  '复制', 'Copy',
+  '已复制', 'Copied'
 ];

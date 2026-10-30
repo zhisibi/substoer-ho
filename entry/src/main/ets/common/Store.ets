@@ -62,6 +62,9 @@ export class Store {
   @Trace accentKey: string = 'red';
   /** 背景： 'solid' 纯色 or a Theme.BACKDROPS key */
   @Trace backdropKey: string = 'solid';
+  /** 特别版： invite code accepted (persisted); installId feeds the per-device 申请码 */
+  @Trace inviteOk: boolean = false;
+  installId: string = '';
   @Trace bp: Breakpoint = 'sm';
   @Trace safeTop: number = 0;
   @Trace safeBottom: number = 0;
@@ -90,6 +93,13 @@ export class Store {
     this.navLight = p.bool('navLight', true);
     this.accentKey = p.str('accent', 'red');
     this.backdropKey = p.str('backdrop', 'solid');
+    this.inviteOk = p.bool('inviteOk', false);
+    this.installId = p.str('installId', '');
+    if (this.installId.length === 0) {
+      this.installId = 'i' + Date.now().toString(36) + Math.floor(Math.random() * 0xFFFFFF).toString(36) +
+        Math.floor(Math.random() * 0xFFFFFF).toString(36);
+      this.prefs?.put('installId', this.installId);
+    }
     // shown on every launch unless the user ticked 不再提示 for this version (the consent page covers first launch)
     this.disclaimerOpen = this.consented && p.num('disclaimerMuted', 0) < DISCLAIMER_VERSION;
     const cv = CoreApi.version();
@@ -170,6 +180,12 @@ export class Store {
   setNavLight(on: boolean): void {
     this.navLight = on;
     this.prefs?.put('navLight', on);
+  }
+
+  /** 特别版： invite code accepted — the gate never shows again. */
+  unlock(): void {
+    this.inviteOk = true;
+    this.prefs?.put('inviteOk', true);
   }
 
   setAccent(key: string): void {

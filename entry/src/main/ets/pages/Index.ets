@@ -12,7 +12,8 @@ import { StoreView, WebHolder } from '../views/StoreView';
 import { LegalPage, LegalText, LicensesPage } from './MiscPages';
 import { LogPage } from './LogPage';
 import { ManagePage } from './ManagePage';
-import { APP_NAME } from '../common/AppInfo';
+import { APP_NAME, SPECIAL_EDITION } from '../common/AppInfo';
+import { InviteGate } from '../views/InviteGate';
 import { DISCLAIMER_LINES, DISCLAIMER_LINES_EN } from '../common/LegalText';
 import { isEn } from '../common/I18n';
 
@@ -240,7 +241,9 @@ struct Index {
       AppBackdrop()
       Navigation(this.store.nav) {
         Column() {
-          if (!this.store.consented) {
+          if (SPECIAL_EDITION && !this.store.inviteOk) {
+            InviteGate()
+          } else if (!this.store.consented) {
             this.consent()
           } else {
             this.main()
@@ -262,7 +265,7 @@ struct Index {
           this.store.setWidth(w);
         }
       })
-      if (this.store.consented && this.store.disclaimerOpen) {
+      if (this.store.consented && this.store.disclaimerOpen && (!SPECIAL_EDITION || this.store.inviteOk)) {
         this.disclaimer()
       }
     }
