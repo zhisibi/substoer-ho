@@ -83,10 +83,30 @@ const CLIPBOARD_JS: string = `
 })();
 `;
 
+/**
+ * Only this app's own service origin may load inside the WebView (plus about:/blob: internals).
+ * data:/javascript: are NOT local: they used to be let through here and could run script in the
+ * WebView with the clipboard bridge attached. Any other 127.0.0.1 port belongs to another app and
+ * is treated as external.
+ */
 function isLocalUrl(url: string): boolean {
   const l = url.toLowerCase();
-  return l.startsWith('http://127.0.0.1:') || l.startsWith('http://localhost:') || l.startsWith('about:') ||
-    l.startsWith('blob:') || l.startsWith('data:') || l.startsWith('javascript:');
+  if (l.startsWith('about:') || l.startsWith('blob:')) {
+    return true;
+  }
+  const port = Store.get().port;
+  const origins: string[] = ['http://127.0.0.1:' + port, 'http://localhost:' + port];
+  for (const o of origins) {
+    if (l === o || l.startsWith(o + '/') || l.startsWith(o + '?') || l.startsWith(o + '#')) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function isBlockedScheme(url: string): boolean {
+  const l = url.toLowerCase();
+  return l.startsWith('data:') || l.startsWith('javascript:') || l.startsWith('file:');
 }
 
 @ComponentV2
@@ -128,10 +148,7 @@ export struct StoreView {
         const p = item.getUrl().split('?')[0];
         name = p.substring(p.lastIndexOf('/') + 1);
       }
-      name = name.replace(new RegExp('[\\\\/:*?"<>|\\n\\r]', 'g'), '_').trim();
-      if (name.length === 0) {
-        name = 'sub-store-' + Date.now();
-      }
+      name = FileUtil.sanitizeFileName(name, 'sub-store-' + Date.now());
       const dir = ctx.cacheDir + '/downloads';
       FileUtil.ensureDir(dir);
       const path = dir + '/' + name;
@@ -201,6 +218,7 @@ export struct StoreView {
       Web({ src: this.srv.running ? this.srv.webUrl() : 'about:blank', controller: WebHolder.controller })
         .javaScriptAccess(true)
         .domStorageAccess(true)
+        .mixedMode(MixedMode.None)
         .fileAccess(false)
         .geolocationAccess(false)
         .zoomAccess(false)
@@ -243,6 +261,9 @@ export struct StoreView {
           const url = e.data.getRequestUrl();
           if (isLocalUrl(url)) {
             return false;
+          }
+          if (isBlockedScheme(url)) {
+            return true; // dropped, not handed to any other app either
           }
           this.openExternal(url);
           return true;

@@ -21,6 +21,7 @@ import (
 	"io/fs"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"path/filepath"
@@ -81,12 +82,16 @@ func activeBackend(dataDir string) (script []byte, ver string, fromUpdate bool) 
 	return backendJS, BackendVersion, false
 }
 
-// activeWeb returns the web UI file system (rooted at the dist folder).
+// activeWeb returns the web UI file system (rooted at the dist folder). Unlike before, the downloaded
+// web UI is only served when the stored web.zip still hashes to the value recorded at install time —
+// the web UI handles every subscription secret, so "index.html exists" is not an integrity check.
 func activeWeb(dataDir string) (fs.FS, string, bool) {
 	dir := filepath.Join(updRoot(dataDir), "web")
 	if v, ok := readInstalled(dir); ok {
-		if st, err := os.Stat(filepath.Join(dir, "dist", "index.html")); err == nil && !st.IsDir() {
-			return os.DirFS(filepath.Join(dir, "dist")), v.Version, true
+		if b, err := os.ReadFile(filepath.Join(dir, "web.zip")); err == nil && sha256Hex(b) == strings.ToLower(v.SHA256) {
+			if st, err := os.Stat(filepath.Join(dir, "dist", "index.html")); err == nil && !st.IsDir() {
+				return os.DirFS(filepath.Join(dir, "dist")), v.Version, true
+			}
 		}
 	}
 	sub, _ := fs.Sub(webFS, "assets/web")
@@ -124,11 +129,35 @@ func verNewer(a, b string) bool {
 	return false
 }
 
+// Hosts an update download may come from directly (GitHub + its release-asset CDNs) or via the
+// user-selectable mirror wrappers. Anything else — and any plain-http URL or redirect downgrade —
+// is refused: the manifest's SHA-256 only proves integrity against the manifest itself, so the
+// channel must at least be pinned to the publisher's own hosts.
+var updateHosts = map[string]bool{
+	"github.com": true, "api.github.com": true,
+	"objects.githubusercontent.com": true, "release-assets.githubusercontent.com": true,
+	"media.githubusercontent.com": true, "raw.githubusercontent.com": true,
+	"ghfast.top": true, "gh-proxy.com": true,
+}
+
+func validUpdateURL(raw string) bool {
+	u, err := url.Parse(raw)
+	return err == nil && u.Scheme == "https" && updateHosts[strings.ToLower(u.Hostname())]
+}
+
 var updClient = &http.Client{Timeout: 120 * time.Second, Transport: &http.Transport{
 	Proxy:                 http.ProxyFromEnvironment,
 	DialContext:           (&net.Dialer{Timeout: 10 * time.Second}).DialContext,
 	TLSHandshakeTimeout:   10 * time.Second,
 	ResponseHeaderTimeout: 20 * time.Second,
+}, CheckRedirect: func(req *http.Request, via []*http.Request) error {
+	if len(via) >= 10 {
+		return errors.New("too many redirects")
+	}
+	if !validUpdateURL(req.URL.String()) {
+		return fmt.Errorf("redirect to untrusted or non-https URL: %s", req.URL.Host)
+	}
+	return nil
 }}
 
 // fetch downloads url, trying each mirror prefix in order ("" = direct). Returns the body and the prefix used.
@@ -136,11 +165,18 @@ func fetch(url string, mirrors []string, max int64) ([]byte, string, error) {
 	if len(mirrors) == 0 {
 		mirrors = []string{""}
 	}
+	if !validUpdateURL(url) {
+		return nil, "", fmt.Errorf("refused non-https or untrusted update URL: %s", url)
+	}
 	var lastErr error
 	for _, m := range mirrors {
 		u := url
 		if m != "" {
 			u = strings.TrimRight(m, "/") + "/" + url
+			if !validUpdateURL(u) {
+				lastErr = fmt.Errorf("refused untrusted mirror URL: %s", m)
+				continue
+			}
 		}
 		req, _ := http.NewRequest(http.MethodGet, u, nil)
 		req.Header.Set("User-Agent", "SubStoreHO/"+CoreVersion)
@@ -286,6 +322,10 @@ func (s *server) UpdateInstall(dataDir, manifestURL string, mirrors []string, pa
 			return info, errors.New("web UI: sha256 mismatch")
 		}
 		if err := installDir(root, "web", func(dir string) error {
+			// keep the zip itself: activeWeb re-hashes it on every start before serving the update
+			if err := os.WriteFile(filepath.Join(dir, "web.zip"), b, 0o644); err != nil {
+				return err
+			}
 			return unzipDist(b, filepath.Join(dir, "dist"))
 		}, installed{Version: man.Frontend.Version, SHA256: sha256Hex(b), Time: time.Now().UnixMilli()}); err != nil {
 			return info, fmt.Errorf("web UI: %w", err)

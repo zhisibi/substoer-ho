@@ -1,9 +1,12 @@
 /** Disclaimer & privacy notice page and open-source licenses. */
 import { isEn, t, tf } from '../common/I18n';
 import { Store } from '../common/Store';
-import { DISCLAIMER_LINES, DISCLAIMER_LINES_EN, LICENSES, LicenseInfo } from '../common/LegalText';
+import {
+  DISCLAIMER_LINES, DISCLAIMER_LINES_EN, LICENSES, LicenseInfo, PRIVACY_LINES, PRIVACY_LINES_EN, TERMS_LINES,
+  TERMS_LINES_EN
+} from '../common/LegalText';
 import { PageHeader } from '../components/Widgets';
-import { APP_NAME, DISCLAIMER_URL, DISCLAIMER_URL_EN, REPO_URL } from '../common/AppInfo';
+import { APP_NAME, DISCLAIMER_URL, DISCLAIMER_URL_EN, PRIVACY_URL, PRIVACY_URL_EN, REPO_URL, TERMS_URL, TERMS_URL_EN } from '../common/AppInfo';
 import { FileUtil } from '../common/FileUtil';
 
 function cells(l: string): string[] {
@@ -70,16 +73,36 @@ export struct LegalText {
 @ComponentV2
 export struct LegalPage {
   private store: Store = Store.get();
+  /** 'disclaimer' | 'privacy' | 'terms', from the NavDestination parameter */
+  @Local doc: string = 'disclaimer';
 
   docUrl(): string {
+    if (this.doc === 'privacy') {
+      return isEn() ? PRIVACY_URL_EN : PRIVACY_URL;
+    }
+    if (this.doc === 'terms') {
+      return isEn() ? TERMS_URL_EN : TERMS_URL;
+    }
     return isEn() ? DISCLAIMER_URL_EN : DISCLAIMER_URL;
   }
 
   docTitle(): string {
+    if (this.doc === 'privacy') {
+      return t('隐私政策');
+    }
+    if (this.doc === 'terms') {
+      return t('用户协议');
+    }
     return t('免责声明与隐私说明');
   }
 
   docLines(): string[] {
+    if (this.doc === 'privacy') {
+      return isEn() ? PRIVACY_LINES_EN : PRIVACY_LINES;
+    }
+    if (this.doc === 'terms') {
+      return isEn() ? TERMS_LINES_EN : TERMS_LINES;
+    }
     return isEn() ? DISCLAIMER_LINES_EN : DISCLAIMER_LINES;
   }
 
@@ -117,6 +140,12 @@ export struct LegalPage {
     }
     .hideTitleBar(true)
     .backgroundColor(this.store.palette().bg)
+    .onReady((ctx: NavDestinationContext) => {
+      const p = ctx.pathInfo.param;
+      if (typeof p === 'string' && p.length > 0) {
+        this.doc = p;
+      }
+    })
   }
 }
 

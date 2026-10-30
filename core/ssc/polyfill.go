@@ -94,7 +94,12 @@ func bytesOf(vm *goja.Runtime, v goja.Value) []byte {
 	if buf, ok := o.Get("buffer").Export().(goja.ArrayBuffer); ok {
 		off := int(o.Get("byteOffset").ToInteger())
 		ln := int(o.Get("byteLength").ToInteger())
-		return buf.Bytes()[off : off+ln]
+		b := buf.Bytes()
+		// bounds-check JS-supplied offsets: an out-of-range view must not panic the backend loop
+		if off < 0 || ln < 0 || off > len(b) || ln > len(b)-off {
+			return nil
+		}
+		return b[off : off+ln]
 	}
 	return nil
 }

@@ -10,10 +10,12 @@ import { LINES, SsUpdate } from '../common/SsUpdate';
 import { ActionButton, CardGroup, CellDivider, NavRow, PageHeader, Segmented, SwitchRow } from '../components/Widgets';
 import { promptText } from '../components/InputDialog';
 import { fmtDuration } from '../common/Format';
-import { APP_NAME, DEFAULT_PORT, DEVELOPER, REPO_NAME, REPO_URL, UPSTREAM_URL, versionName } from '../common/AppInfo';
+import { APP_NAME, DEFAULT_PORT, DEVELOPER, FEEDBACK_QQ_GROUP, UPSTREAM_URL, versionName } from '../common/AppInfo';
 import { FileUtil } from '../common/FileUtil';
+import { LightSense } from '../common/LightSense';
 
 const LANGS: string[] = ['system', 'zh', 'en'];
+const THEMES: string[] = ['system', 'light', 'dark'];
 
 @ComponentV2
 export struct ManagePage {
@@ -71,6 +73,20 @@ export struct ManagePage {
     }
     this.store.setOpt('port', n);
     await this.srv.restartIfRunning();
+  }
+
+  async setLanAccess(v: boolean): Promise<void> {
+    if (v) {
+      const ok = await this.store.confirm(t('允许局域网访问'),
+        t('开启后，同一局域网内的任何设备无需密码就能下载你的订阅（内容含节点地址和密码），且下载走明文传输。只在家里等可信网络中开启，用完建议关闭。'),
+        t('仍然开启'), true);
+      if (!ok) {
+        return;
+      }
+    }
+    this.store.setOpt('lanAccess', v);
+    this.srv.restartIfRunning();
+    this.srv.refreshIps();
   }
 
   async setLanUI(v: boolean): Promise<void> {
@@ -209,7 +225,7 @@ export struct ManagePage {
   @Builder
   addresses() {
     CardGroup({
-      title: t('访问地址'),
+      title: t('访问地址'), collapsible: true, open: true, summary: '127.0.0.1:' + this.store.port,
       footer: t('Sub-Store 里复制的订阅链接是 127.0.0.1 地址，供本机客户端使用；其他设备请换成局域网地址（只能访问 /download 和 /share）。点按地址可复制。')
     }) {
       NavRow({
@@ -240,7 +256,7 @@ export struct ManagePage {
 
   @Builder
   access() {
-    CardGroup({ title: t('端口与访问控制') }) {
+    CardGroup({ title: t('端口与访问控制'), collapsible: true, open: false, summary: String(this.store.port) }) {
       NavRow({
         icon: $r('sys.symbol.gearshape'), title: t('端口'), value: String(this.store.port), onTap: () => {
           this.editPort();
@@ -250,9 +266,7 @@ export struct ManagePage {
       SwitchRow({
         title: t('允许局域网访问'), desc: t('开启后局域网设备可下载订阅（/download、/share）；关闭则只监听 127.0.0.1'),
         on: this.store.lanAccess, onToggle: (v: boolean) => {
-          this.store.setOpt('lanAccess', v);
-          this.srv.restartIfRunning();
-          this.srv.refreshIps();
+          this.setLanAccess(v);
         }
       })
       if (this.store.lanAccess) {
@@ -269,7 +283,7 @@ export struct ManagePage {
 
   @Builder
   bgSection() {
-    CardGroup({ title: t('后台与自动启动') }) {
+    CardGroup({ title: t('后台与自动启动'), collapsible: true, open: false }) {
       SwitchRow({
         title: t('后台继续运行'), desc: t('启动服务时申请系统长时任务（常驻通知），系统仍可能结束它'), on: this.store.background,
         onToggle: (v: boolean) => {
@@ -299,9 +313,42 @@ export struct ManagePage {
     }
   }
 
+  themeLabel(): string {
+    const labels: string[] = [t('跟随系统'), t('浅色'), t('深色')];
+    return labels[Math.max(0, THEMES.indexOf(this.store.themeMode))];
+  }
+
+  @Builder
+  appearance() {
+    CardGroup({ title: t('外观'), collapsible: true, open: false, summary: this.themeLabel() }) {
+      Column({ space: 10 }) {
+        Text(t('主题')).fontSize(13).fontColor(this.store.palette().tertiary).width('100%')
+        Segmented({
+          options: [t('跟随系统'), t('浅色'), t('深色')], selected: Math.max(0, THEMES.indexOf(this.store.themeMode)),
+          onPick: (i: number) => {
+            this.store.setThemeMode(THEMES[i]);
+          }
+        })
+      }
+      .padding({ left: 16, right: 16, top: 12, bottom: 6 })
+      CellDivider()
+      SwitchRow({
+        title: t('导航栏沉浸光感'),
+        desc: LightSense.material() ? t('页面顶栏使用系统沉浸光感材质，呈悬浮玻璃胶囊效果') :
+          t('页面顶栏使用毛玻璃光感效果，呈悬浮玻璃胶囊效果（此设备不支持系统沉浸材质）'),
+        on: this.store.navLight, onToggle: (v: boolean) => {
+          this.store.setNavLight(v);
+        }
+      })
+    }
+  }
+
   @Builder
   language() {
-    CardGroup({ title: t('语言') }) {
+    CardGroup({
+      title: t('语言'), collapsible: true, open: false,
+      summary: [t('跟随系统'), '中文', 'English'][Math.max(0, LANGS.indexOf(this.store.langPref))]
+    }) {
       Segmented({
         options: [t('跟随系统'), '中文', 'English'], selected: Math.max(0, LANGS.indexOf(this.store.langPref)),
         onPick: (i: number) => {
@@ -338,7 +385,7 @@ export struct ManagePage {
 
   @Builder
   update() {
-    CardGroup({ title: t('Sub-Store 更新'), footer: this.updStatus() }) {
+    CardGroup({ title: t('Sub-Store 更新'), collapsible: true, open: false, summary: this.u.backend, footer: this.updStatus() }) {
       NavRow({
         icon: $r('sys.symbol.externaldrive'), title: t('后端'), chevron: false,
         value: this.verText(this.u.backend, this.u.backendUpdated, this.u.latestBackend, this.u.backendNew)
@@ -391,7 +438,7 @@ export struct ManagePage {
 
   @Builder
   about() {
-    CardGroup({ title: t('关于') }) {
+    CardGroup({ title: t('关于'), collapsible: true, open: false, summary: versionName() }) {
       Row({ space: 14 }) {
         Image($r('app.media.startIcon')).width(52).height(52).borderRadius(12)
         Column({ space: 3 }) {
@@ -409,8 +456,8 @@ export struct ManagePage {
       NavRow({ icon: $r('sys.symbol.person'), title: t('开发者'), value: DEVELOPER, chevron: false })
       CellDivider()
       NavRow({
-        icon: $r('sys.symbol.link'), title: t('仓库地址'), value: REPO_NAME, onTap: () => {
-          this.open(REPO_URL);
+        icon: $r('sys.symbol.ellipsis_message'), title: t('问题反馈（QQ群）'), value: FEEDBACK_QQ_GROUP, chevron: false, onTap: () => {
+          this.copy(FEEDBACK_QQ_GROUP);
         }
       })
       CellDivider()
@@ -461,9 +508,10 @@ export struct ManagePage {
             this.addresses()
             this.access()
             this.bgSection()
+            this.appearance()
             this.language()
             this.update()
-            CardGroup({ title: t('日志与声明') }) {
+            CardGroup({ title: t('日志与声明'), collapsible: true, open: false, summary: String(this.srv.logs.length) }) {
               NavRow({
                 icon: $r('sys.symbol.doc_text'), title: t('运行日志'), value: String(this.srv.logs.length), onTap: () => {
                   this.store.push('logs', null);
@@ -473,6 +521,18 @@ export struct ManagePage {
               NavRow({
                 icon: $r('sys.symbol.checkmark_shield'), title: t('免责声明与隐私说明'), onTap: () => {
                   this.store.push('legal', 'disclaimer');
+                }
+              })
+              CellDivider()
+              NavRow({
+                icon: $r('sys.symbol.lock'), title: t('隐私政策'), onTap: () => {
+                  this.store.push('legal', 'privacy');
+                }
+              })
+              CellDivider()
+              NavRow({
+                icon: $r('sys.symbol.doc_text'), title: t('用户协议'), onTap: () => {
+                  this.store.push('legal', 'terms');
                 }
               })
             }

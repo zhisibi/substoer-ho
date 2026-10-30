@@ -14,6 +14,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -236,8 +237,10 @@ func (s *server) Reset(dataDir string) {
 	}
 	if dataDir != "" {
 		os.RemoveAll(filepath.Join(dataDir, "store"))
+		// downloaded backend/web code is code, not data: wiping must not leave it behind to be loaded again
+		os.RemoveAll(filepath.Join(dataDir, "update"))
 	}
-	s.Event("warn", "all Sub-Store data deleted")
+	s.Event("warn", "all Sub-Store data deleted (downloaded updates removed too)")
 }
 
 func (s *server) SetLanUI(on bool) {
@@ -247,6 +250,7 @@ func (s *server) SetLanUI(on bool) {
 }
 
 func (s *server) Event(level, msg string) {
+	msg = redactText(msg)
 	if len(msg) > 4000 {
 		msg = msg[:4000] + "…"
 	}
@@ -379,13 +383,52 @@ func (s *server) handle(w http.ResponseWriter, r *http.Request) {
 	s.serveStatic(cw, r)
 }
 
-func redactPath(u *url.URL) string {
-	q := u.Query()
-	for _, k := range []string{"token", "key", "secret"} {
-		if q.Has(k) {
-			q.Set(k, "***")
+// sensitive query parameter names (matched case-insensitively, as substrings so access_token / api-key count too)
+func sensitiveParam(name string) bool {
+	n := strings.ToLower(name)
+	for _, s := range []string{"token", "secret", "key", "password", "passwd", "auth", "credential"} {
+		if strings.Contains(n, s) {
+			return true
 		}
 	}
+	return false
+}
+
+// redactQuery masks sensitive parameter values in place; a parameter whose value is itself a URL
+// (url=…, the usual way subscription links ride inside a request) is parsed and redacted recursively.
+func redactQuery(q url.Values) {
+	for k, vs := range q {
+		if sensitiveParam(k) {
+			for i := range vs {
+				vs[i] = "***"
+			}
+			q[k] = vs
+			continue
+		}
+		for i, v := range vs {
+			if strings.Contains(v, "://") {
+				if u, err := url.Parse(v); err == nil && len(u.Query()) > 0 {
+					inner := u.Query()
+					redactQuery(inner)
+					u.RawQuery = inner.Encode()
+					vs[i] = u.String()
+				}
+			}
+		}
+		q[k] = vs
+	}
+}
+
+var redactRe = regexp.MustCompile(`(?i)((?:token|secret|api[-_]?key|password|passwd|auth|credential)[a-z0-9_-]*=)([^&\s"'<>]+)`)
+
+// redactText masks `name=value` secrets inside free text (engine console lines carry full subscription URLs).
+func redactText(s string) string {
+	return redactRe.ReplaceAllString(s, "${1}***")
+}
+
+func redactPath(u *url.URL) string {
+	q := u.Query()
+	redactQuery(q)
 	out := u.Path
 	if len(q) > 0 {
 		out += "?" + q.Encode()

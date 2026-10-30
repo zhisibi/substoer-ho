@@ -158,3 +158,17 @@ Run log
 Disclaimer & Privacy Notice
 Disclaimer & Privacy Notice
 Withdraw consent
+Feedback (QQ group)
+When on, any device on the same LAN can download your subscriptions without a password (they contain node addresses and passwords), over plaintext. Only enable this on trusted networks such as home, and turn it off when done.
+Appearance
+Theme
+Light
+Dark
+Immersive light sense
+The page top bar uses the system immersive light-sense material as a floating glass capsule
+The page top bar uses a frosted-glass light-sense effect as a floating glass capsule (this device does not support the system immersive material)
+Privacy Policy
+User Agreement
+Privacy Policy
+User Agreement
+and

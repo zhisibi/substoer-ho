@@ -86,15 +86,41 @@ export class FileUtil {
     });
   }
 
-  /** Last path segment of a document URI, decoded */
+  /**
+   * One safe file name from any untrusted name (picker URI, download suggestion, …):
+   * decode first, then take the basename, so an encoded `%2e%2e%2f` cannot re-introduce a path
+   * separator after splitting; separators and control characters become '_'; '.'/'..'/empty
+   * fall back; length is capped.
+   */
+  static sanitizeFileName(name: string, fallback: string): string {
+    let s = name;
+    try {
+      s = decodeURIComponent(s);
+    } catch (e) {
+      // keep the raw name
+    }
+    const cut = Math.max(s.lastIndexOf('/'), s.lastIndexOf('\\'));
+    if (cut >= 0) {
+      s = s.substring(cut + 1);
+    }
+    s = s.replace(new RegExp('[\\\\/:*?"<>|\\u0000-\\u001f]', 'g'), '_').trim();
+    while (s.startsWith('.')) {
+      s = s.substring(1);
+    }
+    if (s.length === 0) {
+      return fallback;
+    }
+    if (s.length > 120) {
+      s = s.substring(0, 120);
+    }
+    return s;
+  }
+
+  /** Last path segment of a document URI, decoded and sanitized */
   static nameFromUri(uri: string): string {
     const i = uri.lastIndexOf('/');
     const raw = i >= 0 ? uri.substring(i + 1) : uri;
-    try {
-      return decodeURIComponent(raw);
-    } catch (e) {
-      return raw;
-    }
+    return FileUtil.sanitizeFileName(raw, 'imported-file');
   }
 
   static async pickSaveUri(ctx: common.Context, name: string): Promise<string> {

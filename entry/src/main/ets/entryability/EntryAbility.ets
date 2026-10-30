@@ -13,6 +13,7 @@ export default class EntryAbility extends UIAbility {
     const store = Store.get();
     store.systemDark = this.context.config.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK;
     store.init(this.context);
+    store.applyColorMode();
     Server.get().init();
     Log.i('Ability', 'onCreate, launch reason ' + launchParam.launchReason);
   }

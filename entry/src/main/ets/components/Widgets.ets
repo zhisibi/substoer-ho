@@ -5,6 +5,7 @@
  */
 import { t } from '../common/I18n';
 import { Store } from '../common/Store';
+import { BarGlassMod, BarLook, GlassRimMod } from '../common/LightSense';
 
 /** Header height without the status bar */
 export const HEADER_H: number = 52;
@@ -27,7 +28,15 @@ export struct PageHeader {
 
   @BuilderParam actions: () => void = this.noActions;
 
-  build() {
+  barLook(): BarLook {
+    const l = new BarLook();
+    l.on = this.store.navLight;
+    l.dark = this.store.isDark();
+    return l;
+  }
+
+  @Builder
+  content() {
     Row() {
       if (this.showBack) {
         IconBtn({
@@ -61,9 +70,42 @@ export struct PageHeader {
       }
     }
     .width('100%')
-    .height(HEADER_H + (this.topInset ? this.store.safeTop : 0))
-    .padding({ left: this.showBack ? 4 : 12, right: 8, top: this.topInset ? this.store.safeTop : 0 })
+    .height(HEADER_H)
+    .padding({ left: this.showBack ? 4 : 12, right: 8 })
     .alignItems(VerticalAlign.Center)
+  }
+
+  build() {
+    Column() {
+      Stack() {
+        if (this.store.navLight) {
+          // 沉浸光感 capsule: glass surface + two rim overlays, content on top (see LightSense.ets)
+          Row()
+            .width('100%')
+            .height('100%')
+            .borderRadius(HEADER_H / 2)
+            .attributeModifier(new BarGlassMod(this.barLook()))
+          Row()
+            .width('100%')
+            .height('100%')
+            .borderRadius(HEADER_H / 2)
+            .attributeModifier(new GlassRimMod(this.store.isDark(), 0))
+            .hitTestBehavior(HitTestMode.None)
+          Row()
+            .width('100%')
+            .height('100%')
+            .borderRadius(HEADER_H / 2)
+            .attributeModifier(new GlassRimMod(this.store.isDark(), 1))
+            .hitTestBehavior(HitTestMode.None)
+        }
+        this.content()
+      }
+      .width('100%')
+      .height(HEADER_H)
+    }
+    .width('100%')
+    .height(HEADER_H + (this.topInset ? this.store.safeTop : 0))
+    .padding({ left: 10, right: 10, top: this.topInset ? this.store.safeTop : 0 })
   }
 }
 
@@ -275,13 +317,24 @@ export struct NavRow {
   }
 }
 
-/** Section: small grey title above a rounded card holding the content. */
+/** Section: small grey title above a rounded card holding the content; optionally collapsible. */
 @ComponentV2
 export struct CardGroup {
   private store: Store = Store.get();
   @Param title: string = '';
   /** text under the card (grey, small) */
   @Param footer: string = '';
+  /** tappable title row with a rotating chevron; content hidden while collapsed */
+  @Param collapsible: boolean = false;
+  /** current-value summary shown on the title row while collapsed */
+  @Param summary: string = '';
+  /** initial expanded state (collapsible only, read once in aboutToAppear) */
+  @Param open: boolean = true;
+  @Local expanded: boolean = true;
+
+  aboutToAppear(): void {
+    this.expanded = this.open;
+  }
 
   @Builder
   noContent() {
@@ -292,26 +345,59 @@ export struct CardGroup {
   build() {
     Column() {
       if (this.title.length > 0) {
-        Text(this.title)
-          .fontSize(13)
-          .fontColor(this.store.palette().tertiary)
-          .padding({ left: 14, bottom: 8 })
-          .width('100%')
+        Row({ space: 8 }) {
+          Text(this.title)
+            .fontSize(13)
+            .fontColor(this.store.palette().tertiary)
+            .layoutWeight(1)
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+          if (this.collapsible && !this.expanded && this.summary.length > 0) {
+            Text(this.summary)
+              .fontSize(12)
+              .fontColor(this.store.palette().tertiary)
+              .maxLines(1)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+              .constraintSize({ maxWidth: 200 })
+          }
+          if (this.collapsible) {
+            SymbolGlyph($r('sys.symbol.chevron_down'))
+              .fontSize(14)
+              .fontColor([this.store.palette().tertiary])
+              .rotate({ angle: this.expanded ? 180 : 0 })
+              .animation({ duration: 220, curve: Curve.FastOutSlowIn })
+          }
+        }
+        .width('100%')
+        .height(this.collapsible ? 40 : undefined)
+        .padding({ left: 14, right: this.collapsible ? 10 : 0, bottom: this.collapsible ? 0 : 8 })
+        .alignItems(VerticalAlign.Center)
+        .accessibilityText(this.title)
+        .onClick(() => {
+          if (this.collapsible) {
+            this.getUIContext().animateTo({ duration: 220, curve: Curve.FastOutSlowIn }, () => {
+              this.expanded = !this.expanded;
+            });
+          }
+        })
       }
-      Column() {
-        this.content()
-      }
-      .width('100%')
-      .backgroundColor(this.store.palette().card)
-      .borderRadius(12)
-      .clip(true)
-      if (this.footer.length > 0) {
-        Text(this.footer)
-          .fontSize(12)
-          .lineHeight(18)
-          .fontColor(this.store.palette().tertiary)
-          .padding({ left: 14, right: 14, top: 8 })
-          .width('100%')
+      if (!this.collapsible || this.expanded) {
+        Column() {
+          this.content()
+        }
+        .width('100%')
+        .backgroundColor(this.store.palette().card)
+        .borderRadius(12)
+        .clip(true)
+        .transition(TransitionEffect.OPACITY)
+        if (this.footer.length > 0) {
+          Text(this.footer)
+            .fontSize(12)
+            .lineHeight(18)
+            .fontColor(this.store.palette().tertiary)
+            .padding({ left: 14, right: 14, top: 8 })
+            .width('100%')
+        }
       }
     }
     .width('100%')

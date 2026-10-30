@@ -78,6 +78,9 @@ struct Index {
           Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.Center }) {
             Text(t('请阅读并同意')).fontSize(13).fontColor(this.store.palette().tertiary)
             this.link(t('《免责声明与隐私说明》'), 'disclaimer')
+            this.link(t('《隐私政策》'), 'privacy')
+            Text(t('与')).fontSize(13).fontColor(this.store.palette().tertiary)
+            this.link(t('《用户协议》'), 'terms')
           }
           .width('100%')
         }

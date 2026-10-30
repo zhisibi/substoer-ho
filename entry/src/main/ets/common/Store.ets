@@ -5,7 +5,7 @@
  * that runs it is Server.ets. Colors follow the system light / dark mode, like the Sub-Store web UI.
  */
 import { LangState, resolveLang, t, tf } from './I18n';
-import { common } from '@kit.AbilityKit';
+import { common, ConfigurationConstant } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
 import { Prefs } from './Prefs';
 import { CORE_VERSION, DEFAULT_PORT } from './AppInfo';
@@ -14,7 +14,7 @@ import { Log } from './Log';
 import { CoreApi } from './Core';
 
 /** Bump when the disclaimer & privacy notice changes materially: everyone is asked to consent again. */
-export const PRIVACY_VERSION: number = 5;
+export const PRIVACY_VERSION: number = 6;
 /** Bump when the disclaimer changes: it is shown again even to users who chose 不再提示. */
 export const DISCLAIMER_VERSION: number = 2;
 
@@ -54,6 +54,10 @@ export class Store {
   /** ask the system for a long-running task while the server runs */
   @Trace background: boolean = true;
   @Trace systemDark: boolean = false;
+  /** global theme: 'system' | 'light' | 'dark' (外观） */
+  @Trace themeMode: string = 'system';
+  /** 导航栏沉浸光感： native pages' top bar rendered as immersive glass (LightSense) */
+  @Trace navLight: boolean = true;
   @Trace bp: Breakpoint = 'sm';
   @Trace safeTop: number = 0;
   @Trace safeBottom: number = 0;
@@ -78,6 +82,8 @@ export class Store {
     this.lanAccess = p.bool('lanAccess', false);
     this.lanUI = p.bool('lanUI', false);
     this.background = p.bool('background', true);
+    this.themeMode = p.str('theme', 'system');
+    this.navLight = p.bool('navLight', true);
     // shown on every launch unless the user ticked 不再提示 for this version (the consent page covers first launch)
     this.disclaimerOpen = this.consented && p.num('disclaimerMuted', 0) < DISCLAIMER_VERSION;
     const cv = CoreApi.version();
@@ -135,7 +141,45 @@ export class Store {
   }
 
   isDark(): boolean {
+    if (this.themeMode === 'dark') {
+      return true;
+    }
+    if (this.themeMode === 'light') {
+      return false;
+    }
     return this.systemDark;
+  }
+
+  /** Global theme switch: persists, syncs the app color mode (system dialogs follow) and rebuilds views. */
+  setThemeMode(mode: string): void {
+    if (mode === this.themeMode) {
+      return;
+    }
+    this.themeMode = mode;
+    this.prefs?.put('theme', mode);
+    this.applyColorMode();
+    this.epoch++;
+  }
+
+  setNavLight(on: boolean): void {
+    this.navLight = on;
+    this.prefs?.put('navLight', on);
+  }
+
+  /** Lets system components (dialogs, pickers, toasts) follow the in-app theme; 'system' hands the choice back. */
+  applyColorMode(): void {
+    const ctx = this.ctx;
+    if (ctx !== null) {
+      try {
+        const mode = this.themeMode === 'dark' ? ConfigurationConstant.ColorMode.COLOR_MODE_DARK :
+          this.themeMode === 'light' ? ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT :
+          ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET;
+        ctx.getApplicationContext().setColorMode(mode);
+      } catch (e) {
+        Log.w('Store', 'setColorMode failed');
+      }
+    }
+    this.applySystemBar();
   }
 
   palette(): Palette {

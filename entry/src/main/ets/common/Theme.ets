@@ -35,6 +35,15 @@ export class Palette {
   codeText: string = '#303133';
 }
 
+/** '#RRGGBB' (or '#AARRGGBB') with its alpha replaced by `alpha` (0–1), as '#AARRGGBB'. */
+export function withAlpha(hex: string, alpha: number): string {
+  const a = Math.round(Math.max(0, Math.min(1, alpha)) * 255);
+  const h = a.toString(16).toUpperCase();
+  const aa = h.length < 2 ? '0' + h : h;
+  const rgb = hex.length === 9 ? hex.substring(3) : hex.substring(1);
+  return '#' + aa + rgb;
+}
+
 export function lightPalette(): Palette {
   return new Palette();
 }

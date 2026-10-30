@@ -161,5 +161,19 @@ export const EN_PAIRS: string[] = [
   '{0} 以 AGPL-3.0 开源（源代码：{1}），并使用了以下开源软件，在此向其作者致谢。点按查看许可证全文。', '{0} is open source under AGPL-3.0 (source: {1}) and uses the following open-source software, with thanks to their authors. Tap to read a license.',
   '《免责声明与隐私说明》', 'Disclaimer & Privacy Notice',
   '免责声明与隐私说明', 'Disclaimer & Privacy Notice',
-  '撤回同意', 'Withdraw consent'
+  '撤回同意', 'Withdraw consent',
+  '问题反馈（QQ群）', 'Feedback (QQ group)',
+  '开启后，同一局域网内的任何设备无需密码就能下载你的订阅（内容含节点地址和密码），且下载走明文传输。只在家里等可信网络中开启，用完建议关闭。', 'When on, any device on the same LAN can download your subscriptions without a password (they contain node addresses and passwords), over plaintext. Only enable this on trusted networks such as home, and turn it off when done.',
+  '外观', 'Appearance',
+  '主题', 'Theme',
+  '浅色', 'Light',
+  '深色', 'Dark',
+  '导航栏沉浸光感', 'Immersive light sense',
+  '页面顶栏使用系统沉浸光感材质，呈悬浮玻璃胶囊效果', 'The page top bar uses the system immersive light-sense material as a floating glass capsule',
+  '页面顶栏使用毛玻璃光感效果，呈悬浮玻璃胶囊效果（此设备不支持系统沉浸材质）', 'The page top bar uses a frosted-glass light-sense effect as a floating glass capsule (this device does not support the system immersive material)',
+  '隐私政策', 'Privacy Policy',
+  '用户协议', 'User Agreement',
+  '《隐私政策》', 'Privacy Policy',
+  '《用户协议》', 'User Agreement',
+  '与', 'and'
 ];
