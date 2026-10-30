@@ -66,13 +66,14 @@ export class WebHolder {
  * (bright top edge + soft inner glow) that LightSense.GlassRimMod draws natively.
  */
 function glassScript(on: boolean, dark: boolean): string {
+  const st = Store.get();
   const tint = dark ? 'linear-gradient(180deg,rgba(64,70,82,0.42),rgba(24,26,32,0.50))' :
     'linear-gradient(180deg,rgba(255,255,255,0.50),rgba(255,255,255,0.28))';
   const rim = dark ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.70)';
   const rimSoft = dark ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.35)';
   const sheen = dark ? 'rgba(255,255,255,0.13)' : 'rgba(255,255,255,0.38)';
   const shadow = dark ? '0 14px 34px rgba(0,0,0,0.42)' : '0 14px 34px rgba(15,23,42,0.16)';
-  const css = on ?
+  let css = on ?
     '.tab-bar-wrapper{background:transparent!important}' +
     '.nut-tabbar{position:fixed!important;left:14px!important;right:14px!important;width:auto!important;' +
     'bottom:calc(env(safe-area-inset-bottom, 0px) + 10px)!important;border-radius:30px!important;overflow:hidden!important;' +
@@ -85,12 +86,24 @@ function glassScript(on: boolean, dark: boolean): string {
     '.nut-tabbar::before{content:"";position:absolute;left:0;top:0;right:0;bottom:0;pointer-events:none;' +
     'background:linear-gradient(115deg,' + sheen + ' 0%,rgba(255,255,255,0) 42%)}' +
     '.nut-tabbar-item,.nut-tabbar-item_icon-box{position:relative;z-index:1}' : '';
+  // 主题色： the front-end paints from --primary-color / --primary-color-end (set inline by its own theme
+  // engine); a stylesheet !important rule wins over those inline custom properties.
+  const tone = st.accentDef().tone(dark);
+  css += ':root{--primary-color:' + tone.ui + '!important;--primary-color-end:' + tone.text + '!important}';
+  // 背景： gradient on the page root, page/card colors turned translucent so it shows through.
+  if (st.backdropOn()) {
+    const s = st.backdropStops();
+    css += 'html,body{background:linear-gradient(160deg,' + s[0] + ',' + s[1] + ',' + s[2] +
+      ')!important;background-attachment:fixed!important}' +
+      ':root{--background-color:transparent!important;--card-color:' +
+      (dark ? 'rgba(32,32,32,0.85)' : 'rgba(255,255,255,0.85)') + '!important}';
+  }
   return '(function(){try{' +
-    'var old=document.getElementById("mss-glass");' +
-    (on ? 'var css=' + JSON.stringify(css) + ';' +
-      'if(!old){old=document.createElement("style");old.id="mss-glass";(document.head||document.documentElement).appendChild(old);}' +
-      'if(old.textContent!==css){old.textContent=css;}'
-      : 'if(old){old.remove();}') +
+    'var old=document.getElementById("mss-theme");' +
+    'var legacy=document.getElementById("mss-glass");if(legacy){legacy.remove();}' +
+    'var css=' + JSON.stringify(css) + ';' +
+    'if(!old){old=document.createElement("style");old.id="mss-theme";(document.head||document.documentElement).appendChild(old);}' +
+    'if(old.textContent!==css){old.textContent=css;}' +
     '}catch(e){}})();';
 }
 
@@ -365,12 +378,12 @@ export struct StoreView {
         .width('100%')
         .height('100%')
         .justifyContent(FlexAlign.Center)
-        .backgroundColor(this.store.isDark() ? '#121212' : '#F4F4F4')
+        .backgroundColor(this.store.backdropOn() ? '#00000000' : (this.store.isDark() ? '#121212' : '#F4F4F4'))
       }
     }
     .width('100%')
     .height('100%')
     .padding({ top: this.store.safeTop, bottom: this.store.safeBottom })
-    .backgroundColor(this.store.isDark() ? '#121212' : '#F4F4F4')
+    .backgroundColor(this.store.backdropOn() ? '#00000000' : (this.store.isDark() ? '#121212' : '#F4F4F4'))
   }
 }

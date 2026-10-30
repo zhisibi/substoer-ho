@@ -7,6 +7,7 @@ import { t } from '../common/I18n';
 import { Store } from '../common/Store';
 import { Server } from '../common/Server';
 import { ActionButton } from '../components/Widgets';
+import { AppBackdrop } from '../components/Backdrop';
 import { StoreView, WebHolder } from '../views/StoreView';
 import { LegalPage, LegalText, LicensesPage } from './MiscPages';
 import { LogPage } from './LogPage';
@@ -111,7 +112,7 @@ struct Index {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor(this.store.palette().bg)
+    .backgroundColor(this.store.backdropOn() ? '#00000000' : this.store.palette().bg)
     .padding({ top: this.store.safeTop })
   }
 
@@ -236,6 +237,7 @@ struct Index {
 
   build() {
     Stack() {
+      AppBackdrop()
       Navigation(this.store.nav) {
         Column() {
           if (!this.store.consented) {
@@ -253,7 +255,7 @@ struct Index {
       .mode(NavigationMode.Stack)
       .width('100%')
       .height('100%')
-      .backgroundColor(this.store.palette().bg)
+      .backgroundColor(this.store.backdropOn() ? '#00000000' : this.store.palette().bg)
       .onAreaChange((o: Area, n: Area) => {
         const w = Number(n.width);
         if (!isNaN(w) && w > 0) {

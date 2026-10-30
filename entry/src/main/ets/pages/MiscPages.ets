@@ -6,6 +6,7 @@ import {
   TERMS_LINES_EN
 } from '../common/LegalText';
 import { PageHeader } from '../components/Widgets';
+import { AppBackdrop } from '../components/Backdrop';
 import { APP_NAME, DISCLAIMER_URL, DISCLAIMER_URL_EN, PRIVACY_URL, PRIVACY_URL_EN, REPO_URL, TERMS_URL, TERMS_URL_EN } from '../common/AppInfo';
 import { FileUtil } from '../common/FileUtil';
 
@@ -108,12 +109,14 @@ export struct LegalPage {
 
   build() {
     NavDestination() {
-      Column() {
-        PageHeader({
-          title: this.docTitle(), showBack: true, onBack: () => {
-            this.store.pop();
-          }
-        })
+      Stack() {
+        AppBackdrop()
+        Column() {
+          PageHeader({
+            title: this.docTitle(), showBack: true, onBack: () => {
+              this.store.pop();
+            }
+          })
         Scroll() {
           Column() {
             LegalText({ lines: this.docLines() })
@@ -130,16 +133,19 @@ export struct LegalPage {
           .padding({ left: 20, right: 20, top: 4, bottom: this.store.safeBottom + 24 })
           .constraintSize({ maxWidth: 760 })
         }
-        .layoutWeight(1)
+          .layoutWeight(1)
+          .width('100%')
+          .align(Alignment.Top)
+          .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+        }
         .width('100%')
-        .align(Alignment.Top)
-        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+        .height('100%')
       }
       .width('100%')
       .height('100%')
     }
     .hideTitleBar(true)
-    .backgroundColor(this.store.palette().bg)
+    .backgroundColor(this.store.backdropOn() ? '#00000000' : this.store.palette().bg)
     .onReady((ctx: NavDestinationContext) => {
       const p = ctx.pathInfo.param as string | undefined;
       if (p !== undefined && p.length > 0) {
@@ -202,12 +208,14 @@ export struct LicensesPage {
 
   build() {
     NavDestination() {
-      Column() {
-        PageHeader({
-          title: t('开源许可'), showBack: true, onBack: () => {
-            this.store.pop();
-          }
-        })
+      Stack() {
+        AppBackdrop()
+        Column() {
+          PageHeader({
+            title: t('开源许可'), showBack: true, onBack: () => {
+              this.store.pop();
+            }
+          })
         Scroll() {
           Column({ space: 10 }) {
             Text(tf('{0} 以 AGPL-3.0 开源（源代码：{1}），并使用了以下开源软件，在此向其作者致谢。点按查看许可证全文。', APP_NAME, REPO_URL))
@@ -223,15 +231,18 @@ export struct LicensesPage {
           .padding({ left: 12, right: 12, top: 4, bottom: this.store.safeBottom + 24 })
           .constraintSize({ maxWidth: 760 })
         }
-        .layoutWeight(1)
+          .layoutWeight(1)
+          .width('100%')
+          .align(Alignment.Top)
+          .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+        }
         .width('100%')
-        .align(Alignment.Top)
-        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+        .height('100%')
       }
       .width('100%')
       .height('100%')
     }
     .hideTitleBar(true)
-    .backgroundColor(this.store.palette().bg)
+    .backgroundColor(this.store.backdropOn() ? '#00000000' : this.store.palette().bg)
   }
 }

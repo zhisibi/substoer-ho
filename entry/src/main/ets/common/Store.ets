@@ -9,7 +9,7 @@ import { common, ConfigurationConstant } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
 import { Prefs } from './Prefs';
 import { CORE_VERSION, DEFAULT_PORT } from './AppInfo';
-import { Palette, darkPalette, lightPalette } from './Theme';
+import { AccentDef, Palette, applyAccent, applyBackdrop, darkPalette, findAccent, findBackdrop, lightPalette } from './Theme';
 import { Log } from './Log';
 import { CoreApi } from './Core';
 
@@ -58,6 +58,10 @@ export class Store {
   @Trace themeMode: string = 'system';
   /** 导航栏沉浸光感： native pages' top bar rendered as immersive glass (LightSense) */
   @Trace navLight: boolean = true;
+  /** 主题色 accent key (Theme.ACCENTS); default 'red' 华为红 */
+  @Trace accentKey: string = 'red';
+  /** 背景： 'solid' 纯色 or a Theme.BACKDROPS key */
+  @Trace backdropKey: string = 'solid';
   @Trace bp: Breakpoint = 'sm';
   @Trace safeTop: number = 0;
   @Trace safeBottom: number = 0;
@@ -84,6 +88,8 @@ export class Store {
     this.background = p.bool('background', true);
     this.themeMode = p.str('theme', 'system');
     this.navLight = p.bool('navLight', true);
+    this.accentKey = p.str('accent', 'red');
+    this.backdropKey = p.str('backdrop', 'solid');
     // shown on every launch unless the user ticked 不再提示 for this version (the consent page covers first launch)
     this.disclaimerOpen = this.consented && p.num('disclaimerMuted', 0) < DISCLAIMER_VERSION;
     const cv = CoreApi.version();
@@ -166,6 +172,34 @@ export class Store {
     this.prefs?.put('navLight', on);
   }
 
+  setAccent(key: string): void {
+    this.accentKey = key;
+    this.prefs?.put('accent', key);
+    this.epoch++;
+  }
+
+  setBackdrop(key: string): void {
+    this.backdropKey = key;
+    this.prefs?.put('backdrop', key);
+    this.epoch++;
+  }
+
+  accentDef(): AccentDef {
+    return findAccent(this.accentKey);
+  }
+
+  backdropOn(): boolean {
+    return this.backdropKey !== 'solid';
+  }
+
+  /** Gradient stops of the selected 背景 in the current mode; [] when 纯色. */
+  backdropStops(): string[] {
+    if (!this.backdropOn()) {
+      return [];
+    }
+    return findBackdrop(this.backdropKey).stops(this.isDark());
+  }
+
   /** Lets system components (dialogs, pickers, toasts) follow the in-app theme; 'system' hands the choice back. */
   applyColorMode(): void {
     const ctx = this.ctx;
@@ -183,7 +217,8 @@ export class Store {
   }
 
   palette(): Palette {
-    return this.isDark() ? darkPalette() : lightPalette();
+    const base = this.isDark() ? darkPalette() : lightPalette();
+    return applyBackdrop(applyAccent(base, this.accentDef()), this.backdropOn());
   }
 
   /** 'system' | 'zh' | 'en'; views are re-created so cached texts follow */

@@ -14,6 +14,8 @@ import { APP_NAME, DEFAULT_PORT, DEVELOPER, FEEDBACK_QQ_GROUP, UPSTREAM_URL, ver
 import { FileUtil } from '../common/FileUtil';
 import { LightSense } from '../common/LightSense';
 import { WebHolder } from '../views/StoreView';
+import { AppBackdrop } from '../components/Backdrop';
+import { ACCENTS, BACKDROPS, AccentDef, BackdropDef, onColor } from '../common/Theme';
 
 const LANGS: string[] = ['system', 'zh', 'en'];
 const THEMES: string[] = ['system', 'light', 'dark'];
@@ -320,8 +322,82 @@ export struct ManagePage {
   }
 
   @Builder
+  accentSwatch(a: AccentDef) {
+    Column({ space: 6 }) {
+      Stack() {
+        Circle().width(38).height(38).fill(a.swatch)
+        if (this.store.accentKey === a.key) {
+          SymbolGlyph($r('sys.symbol.checkmark')).fontSize(17).fontColor([onColor(a.swatch)])
+            .fontWeight(FontWeight.Bold)
+        }
+      }
+      .width(46)
+      .height(46)
+      .borderRadius(23)
+      .border({ width: this.store.accentKey === a.key ? 2 : 0, color: a.swatch })
+      Text(t(a.name)).fontSize(12)
+        .fontColor(this.store.accentKey === a.key ? this.store.palette().text : this.store.palette().tertiary)
+    }
+    .width(62)
+    .padding({ top: 2, bottom: 2 })
+    .onClick(() => {
+      this.store.setAccent(a.key);
+      WebHolder.applyGlass();
+    })
+  }
+
+  @Builder
+  backdropSwatch(key: string, name: string, stops: string[]) {
+    Column({ space: 6 }) {
+      Stack({ alignContent: Alignment.BottomEnd }) {
+        if (stops.length === 3) {
+          Column()
+            .width(50)
+            .height(62)
+            .borderRadius(10)
+            .linearGradient({ angle: 160, colors: [[stops[0], 0], [stops[1], 0.55], [stops[2], 1]] })
+        } else {
+          Column()
+            .width(50)
+            .height(62)
+            .borderRadius(10)
+            .backgroundColor(this.store.isDark() ? '#202020' : '#FFFFFF')
+        }
+        if (this.store.backdropKey === key) {
+          Stack() {
+            SymbolGlyph($r('sys.symbol.checkmark')).fontSize(10).fontColor(['#FFFFFF']).fontWeight(FontWeight.Bold)
+          }
+          .width(17)
+          .height(17)
+          .borderRadius(9)
+          .backgroundColor(this.store.palette().primary)
+          .margin({ right: 3, bottom: 3 })
+        }
+      }
+      .width(54)
+      .height(66)
+      .borderRadius(12)
+      .border({
+        width: this.store.backdropKey === key ? 2 : 1,
+        color: this.store.backdropKey === key ? this.store.palette().primary : this.store.palette().outline
+      })
+      Text(t(name)).fontSize(12)
+        .fontColor(this.store.backdropKey === key ? this.store.palette().text : this.store.palette().tertiary)
+    }
+    .width(62)
+    .padding({ top: 2, bottom: 2 })
+    .onClick(() => {
+      this.store.setBackdrop(key);
+      WebHolder.applyGlass();
+    })
+  }
+
+  @Builder
   appearance() {
-    CardGroup({ title: t('外观'), collapsible: true, open: false, summary: this.themeLabel() }) {
+    CardGroup({
+      title: t('外观'), collapsible: true, open: false,
+      summary: this.themeLabel() + ' · ' + t(this.store.accentDef().name)
+    }) {
       Column({ space: 10 }) {
         Text(t('主题')).fontSize(13).fontColor(this.store.palette().tertiary).width('100%')
         Segmented({
@@ -333,6 +409,29 @@ export struct ManagePage {
         })
       }
       .padding({ left: 16, right: 16, top: 12, bottom: 6 })
+      CellDivider()
+      Column({ space: 10 }) {
+        Text(t('主题色')).fontSize(13).fontColor(this.store.palette().tertiary).width('100%')
+        Flex({ wrap: FlexWrap.Wrap }) {
+          ForEach(ACCENTS, (a: AccentDef) => {
+            this.accentSwatch(a)
+          }, (a: AccentDef) => a.key)
+        }
+        .width('100%')
+      }
+      .padding({ left: 16, right: 16, top: 10, bottom: 6 })
+      CellDivider()
+      Column({ space: 10 }) {
+        Text(t('背景')).fontSize(13).fontColor(this.store.palette().tertiary).width('100%')
+        Flex({ wrap: FlexWrap.Wrap }) {
+          this.backdropSwatch('solid', '纯色', [])
+          ForEach(BACKDROPS, (b: BackdropDef) => {
+            this.backdropSwatch(b.key, b.name, b.light)
+          }, (b: BackdropDef) => b.key)
+        }
+        .width('100%')
+      }
+      .padding({ left: 16, right: 16, top: 10, bottom: 6 })
       CellDivider()
       SwitchRow({
         title: t('导航栏沉浸光感'),
@@ -499,12 +598,14 @@ export struct ManagePage {
 
   build() {
     NavDestination() {
-      Column() {
-        PageHeader({
-          title: t('服务管理'), showBack: true, onBack: () => {
-            this.store.pop();
-          }
-        })
+      Stack() {
+        AppBackdrop()
+        Column() {
+          PageHeader({
+            title: t('服务管理'), showBack: true, onBack: () => {
+              this.store.pop();
+            }
+          })
         Scroll() {
           Column({ space: 20 }) {
             this.statusCard()
@@ -544,16 +645,19 @@ export struct ManagePage {
           .padding({ left: 14, right: 14, top: 4, bottom: this.store.bottomPad() })
           .constraintSize({ maxWidth: 760 })
         }
-        .layoutWeight(1)
+          .layoutWeight(1)
+          .width('100%')
+          .align(Alignment.Top)
+          .scrollBar(BarState.Off)
+          .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+        }
         .width('100%')
-        .align(Alignment.Top)
-        .scrollBar(BarState.Off)
-        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+        .height('100%')
       }
       .width('100%')
       .height('100%')
     }
     .hideTitleBar(true)
-    .backgroundColor(this.store.palette().bg)
+    .backgroundColor(this.store.backdropOn() ? '#00000000' : this.store.palette().bg)
   }
 }

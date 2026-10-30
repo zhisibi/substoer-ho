@@ -7,6 +7,7 @@ import { t, tf } from '../common/I18n';
 import { Store } from '../common/Store';
 import { AccessLine, Server } from '../common/Server';
 import { IconBtn, PageHeader, Segmented } from '../components/Widgets';
+import { AppBackdrop } from '../components/Backdrop';
 import { FileUtil } from '../common/FileUtil';
 import { fmtBytes } from '../common/Format';
 
@@ -116,12 +117,14 @@ export struct LogPage {
 
   build() {
     NavDestination() {
-      Column() {
-        PageHeader({
-          title: t('完整日志'), subtitle: tf('{0} 条', this.shown().length), showBack: true, onBack: () => {
-            this.store.pop();
-          }
-        }) {
+      Stack() {
+        AppBackdrop()
+        Column() {
+          PageHeader({
+            title: t('完整日志'), subtitle: tf('{0} 条', this.shown().length), showBack: true, onBack: () => {
+              this.store.pop();
+            }
+          }) {
           IconBtn({
             icon: $r('sys.symbol.doc_filled_on_doc'), label: t('复制全部'), onTap: () => {
               this.copyAll();
@@ -162,14 +165,17 @@ export struct LogPage {
           .cachedCount(20)
           .scrollBar(BarState.Auto)
           .divider({ strokeWidth: 0.5, color: this.store.palette().divider, startMargin: 12, endMargin: 12 })
-          .backgroundColor(this.store.palette().card)
-          .padding({ bottom: this.store.safeBottom })
+            .backgroundColor(this.store.palette().card)
+            .padding({ bottom: this.store.safeBottom })
+          }
         }
+        .width('100%')
+        .height('100%')
       }
       .width('100%')
       .height('100%')
     }
     .hideTitleBar(true)
-    .backgroundColor(this.store.palette().bg)
+    .backgroundColor(this.store.backdropOn() ? '#00000000' : this.store.palette().bg)
   }
 }
