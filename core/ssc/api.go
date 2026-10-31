@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	CoreVersion     = "1.2.0"
+	CoreVersion     = "1.4.1"
 	BackendVersion  = "2.42.6" // sub-store-org/Sub-Store backend (bundled, patched express adapter)
 	FrontendVersion = "2.34.1" // sub-store-org/Sub-Store-Front-End dist
 )

@@ -2,7 +2,7 @@
 # Build libmimisubstore.so (Go: embedded Sub-Store backend (goja) + HTTP server + NAPI) for HarmonyOS arm64 with the OHOS Go fork.
 # Needs host clang (ohos-cc wraps it with the OHOS sysroot). Output: $OUT/libmimisubstore.so
 set -e
-GM=${GM:-/workspace/work/gm}  # OHOS Go fork + ohos-cc wrapper
+GM=${GM:-$HOME/workspace/lanbox-build/gm}  # OHOS Go fork + ohos-cc wrapper
 HERE=$(cd "$(dirname "$0")" && pwd)
 export PATH=$GM/ohos-go/bin:$PATH GOTOOLCHAIN=local GOFLAGS=-mod=mod
 export GOPATH=$GM/gopath GOMODCACHE=$GM/gopath/pkg/mod GOCACHE=/workspace/work/substore/gocache-ohos

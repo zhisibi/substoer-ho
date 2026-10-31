@@ -372,6 +372,10 @@ func (s *server) handle(w http.ResponseWriter, r *http.Request) {
 		http.Error(cw, "403 forbidden: only subscription links (/download, /share) are reachable from other devices", http.StatusForbidden)
 		return
 	}
+	if strings.HasPrefix(p, "/mss/gh/") {
+		s.serveGHProxy(cw, r)
+		return
+	}
 	if backend {
 		if eng == nil {
 			http.Error(cw, "Sub-Store backend not running", http.StatusServiceUnavailable)
@@ -506,6 +510,9 @@ func (s *server) serveStatic(w http.ResponseWriter, r *http.Request) {
 			http.NotFound(w, r)
 			return
 		}
+	}
+	if name == "index.html" {
+		data = injectIndex(data)
 	}
 	ct := mime.TypeByExtension(path.Ext(name))
 	if ct == "" {

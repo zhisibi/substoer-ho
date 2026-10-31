@@ -17,7 +17,7 @@ export const TERMS_URL: string = 'https://github.com/zhisibi/substoer-ho/blob/ma
 export const TERMS_URL_EN: string = 'https://github.com/zhisibi/substoer-ho/blob/main/docs/terms.en.md';
 export const UPSTREAM_URL: string = 'https://github.com/sub-store-org/Sub-Store';
 /** Version of libmimisubstore.so this app expects (core/ssc CoreVersion) */
-export const CORE_VERSION: string = '1.2.0';
+export const CORE_VERSION: string = '1.4.1';
 export const DEFAULT_PORT: number = 3000;
 
 let cachedVersion: string = '';
