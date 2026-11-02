@@ -1,10 +1,10 @@
-# MimiSubStore Privacy Policy
+# MimiSub Privacy Policy
 
 Updated: 30 October 2026 (version 1)
 
 Developer: Zhang Shibo ("we"). Contact: feedback QQ group 1127250124.
 
-MimiSubStore ("the app") is a subscription management and format-conversion tool that runs entirely on your device. Its design principle is simple: **we collect no personal information, and your data stays on your device.** Please read this policy before use.
+MimiSub ("the app") is a subscription management and format-conversion tool that runs entirely on your device. Its design principle is simple: **we collect no personal information, and your data stays on your device.** Please read this policy before use.
 
 ## 1. Information we collect
 

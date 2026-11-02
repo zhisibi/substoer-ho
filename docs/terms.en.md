@@ -1,8 +1,8 @@
-# MimiSubStore User Agreement
+# MimiSub User Agreement
 
 Updated: 30 October 2026 (version 1)
 
-Welcome to MimiSubStore ("the app"). Using the app means you have read and agree to this agreement and the Privacy Policy; if you do not agree, please stop using and uninstall it. The app is open source under AGPL-3.0, and your rights under that licence are not limited by this agreement.
+Welcome to MimiSub ("the app"). Using the app means you have read and agree to this agreement and the Privacy Policy; if you do not agree, please stop using and uninstall it. The app is open source under AGPL-3.0, and your rights under that licence are not limited by this agreement.
 
 ## 1. About the service
 

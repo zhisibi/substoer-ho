@@ -1,7 +1,7 @@
 /** Fixed app facts shown in 服务管理 › 关于 and used by the legal pages. */
 import { bundleManager } from '@kit.AbilityKit';
 
-export const APP_NAME: string = '咪咪SubStore';
+export const APP_NAME: string = '咪咪订阅';
 export const DEVELOPER: string = '张世博';
 /** 问题反馈 QQ 群（关于页显示群号，点按复制） */
 export const FEEDBACK_QQ_GROUP: string = '1127250124';

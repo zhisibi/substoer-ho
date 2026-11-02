@@ -14,7 +14,7 @@ import { Log } from './Log';
 import { CoreApi } from './Core';
 
 /** Bump when the disclaimer & privacy notice changes materially: everyone is asked to consent again. */
-export const PRIVACY_VERSION: number = 6;
+export const PRIVACY_VERSION: number = 7;
 /** Bump when the disclaimer changes: it is shown again even to users who chose 不再提示. */
 export const DISCLAIMER_VERSION: number = 2;
 
