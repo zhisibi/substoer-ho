@@ -20,11 +20,25 @@ export class WebHolder {
   static attached: boolean = false;
   static delegate: webview.WebDownloadDelegate = new webview.WebDownloadDelegate();
   static delegateBound: boolean = false;
+  /** Last committed main-frame URL (tracked via onPageBegin/onPageEnd). */
+  static currentUrl: string = '';
 
-  /** Back inside the web UI; false when there is no history (the page handles the back press itself then). */
+  /**
+   * Back inside the web UI; false when there is no history (the page handles the back press itself then).
+   * Standing on a blank page (about:blank) heals by reloading the app instead of stepping further back:
+   * an about:blank history entry once stranded the app on an empty page (store review, 2026-11).
+   */
   static back(): boolean {
     try {
-      if (WebHolder.attached && WebHolder.controller.accessBackward()) {
+      if (!WebHolder.attached) {
+        return false;
+      }
+      const cur = WebHolder.currentUrl;
+      if (cur === '' || cur.toLowerCase().startsWith('about:')) {
+        WebHolder.reload(Server.get().webUrl());
+        return true;
+      }
+      if (WebHolder.controller.accessBackward()) {
         WebHolder.controller.backward();
         return true;
       }
@@ -178,10 +192,23 @@ export struct StoreView {
   private bridge: HostBridge = new HostBridge();
   @Local loading: boolean = true;
   @Local failed: string = '';
+  /** The Web is only created once the service has run at least once, so its history starts at the app
+   *  URL — never at an about:blank placeholder entry that a back gesture could land on. */
+  @Local everRan: boolean = false;
   private loadedEpoch: number = -1;
 
   aboutToAppear(): void {
     this.bindDownloads();
+    if (this.srv.running) {
+      this.everRan = true;
+    }
+  }
+
+  @Monitor('srv.running')
+  onRunning(): void {
+    if (this.srv.running) {
+      this.everRan = true;
+    }
   }
 
   @Monitor('srv.startEpoch')
@@ -277,7 +304,8 @@ export struct StoreView {
 
   build() {
     Stack() {
-      Web({ src: this.srv.running ? this.srv.webUrl() : 'about:blank', controller: WebHolder.controller })
+      if (this.everRan) {
+      Web({ src: this.srv.webUrl(), controller: WebHolder.controller })
         .javaScriptAccess(true)
         .domStorageAccess(true)
         .mixedMode(MixedMode.None)
@@ -307,12 +335,18 @@ export struct StoreView {
             WebHolder.reload(this.srv.webUrl());
           }
         })
-        .onPageBegin(() => {
+        .onPageBegin((e: OnPageBeginEvent) => {
+          WebHolder.currentUrl = e.url;
           this.loading = true;
         })
-        .onPageEnd(() => {
+        .onPageEnd((e: OnPageEndEvent) => {
+          WebHolder.currentUrl = e.url;
           this.loading = false;
           WebHolder.applyGlass();
+          // belt & braces: however we got here, a blank page while the service runs reloads the app
+          if ((e.url === '' || e.url.toLowerCase().startsWith('about:')) && this.srv.running) {
+            WebHolder.reload(this.srv.webUrl());
+          }
         })
         .onErrorReceive((e: OnErrorReceiveEvent) => {
           if (e.request.isMainFrame()) {
@@ -361,6 +395,7 @@ export struct StoreView {
         .width('100%')
         .height('100%')
         .visibility(this.srv.running ? Visibility.Visible : Visibility.Hidden)
+      }
 
       if (!this.srv.running) {
         this.placeholder()
